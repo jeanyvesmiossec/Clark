@@ -100,7 +100,7 @@ Initialize project
              'views/res_partner_view.xml',
              'views/res_users_view.xml',
              'views/res_company_view.xml',
-             'data/menu_icon.xml',
+             #'data/menu_icon.xml',
              'data/ir_cron.xml',
 #              'views/res_config_settings_view.xml',
 #              'data/ir_config_parameter.xml'
