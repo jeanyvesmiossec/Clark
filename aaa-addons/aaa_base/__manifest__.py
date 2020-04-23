@@ -13,7 +13,7 @@ Initialize project
     'website': 'https://www.auguria.fr',
     'images': [],
     'depends': [
-                'muk_utils',
+                #'muk_utils',
                 'crm',
                 'website',
                 'project',
