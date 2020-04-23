@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="ooc_history_view_tree" model="ir.ui.view">
+            <field name="name">ooc.history.tree.view</field>
+            <field name="model">ooc.history</field>
+            <field name="arch" type="xml">
+                <tree string="Outlook Connector History" create="false" delete="false">
+                    <field name="mail"/>
+                    <field name="model"/>
+                    <field name="res_id"/>
+                    <field name="user"/>
+                    <field name="create_date"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="ooc_history_view_form" model="ir.ui.view">
+            <field name="name">ooc.history.view.form</field>
+            <field name="model">ooc.history</field>
+            <field name="arch" type="xml">
+                <form string="Outlook History Form" create="false" edit="false" delete="false">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="mail"/>
+                                <field name="model"/>
+                                <field name="res_id"/>
+                                <field name="user"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="ooc_history_view_search" model="ir.ui.view">
+            <field name="name">ooc.history.view.search</field>
+            <field name="model">ooc.history</field>
+            <field name="arch" type="xml">
+                <search string="Search History">
+                    <field name="user" string="User" domain="[('model','ilike', self)]"/>
+                    <!--<group expand="0" name="group_by" string="Group By">-->
+                        <!--<filter string="User" domain="[]" context="{'group_by': 'user'}"/>-->
+                        <!--<filter string="Model" domain="[]" context="{'group_by': 'model'}"/>-->
+                        <!--<filter string="Created On" domain="[]" context="{'group_by': 'create_date'}"/>-->
+                    <!--</group>-->
+                </search>
+            </field>
+        </record>
+
+        <record id="action_ooc_history" model="ir.actions.act_window">
+            <field name="name">History</field>
+            <field name="res_model">ooc.history</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p>
+                    No history found.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

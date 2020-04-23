@@ -1,0 +1,125 @@
+﻿/* Page-specific styling */
+html, body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+#loading-field {
+    position: relative;
+    margin-top: 80px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    padding: 0;
+    transform: translate(-50%, -50%)
+}
+
+#loading-field .ms-Spinner {
+    width: 28px;
+    height: 28px;
+}
+
+.form-field {
+    position: absolute;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+}
+
+#email-body {
+    height: 137px;
+}
+
+#model-items .ms-Dropdown-title {
+    display: none;
+}
+
+#model-items .ms-SearchBox-field, #model-items .ms-SearchBox {
+    width: 100%;
+}
+
+#model-items .ms-SearchBox {
+    margin-bottom: 0px;
+}
+
+#create-body {
+    height: 190px;
+}
+
+#create-attachment-list {
+    height: 167px;
+}
+
+.loading {
+    display: inline-block;
+    width: 150px;
+    height: auto;
+}
+
+.loading .ms-Spinner-label {
+    position: relative;
+    top: 0;
+}
+
+.success, .error {
+    display: inline-block;
+    padding: 0 1em;
+    position: absolute;
+}
+
+#info-table {
+    overflow: auto;
+    overflow-y: scroll;
+    max-height: 226px;
+}
+
+#info-field .ms-Table {
+    width: auto;
+}
+
+#info-field td:not(:first-child) {
+    padding: 0 30px 0 10px;
+}
+
+.choice-field-group { 
+    border-style: solid;
+    border-width: 1px;
+    padding: 10px;
+    height: 100%;
+    overflow-y: scroll;
+    height: 115px;
+}
+
+.choice-field-group:hover {
+    border-color: #767676;
+}
+
+.ms-TextField-field {
+    min-width: 0 !important;
+}
+
+.ms-SearchBox-field::-ms-clear {
+  width : 0;
+  height: 0;
+}
+
+.ms-Dropdown-items {
+    max-height: 280px;
+}
+
+.input-error {
+    border-color: #E81123 !important;
+}
+
+.ms-SearchBox-label {
+    display: block;
+}
+
+.ms-Button.ms-Button--command {
+    display: block;
+    margin: 15px 0 !important;
+}

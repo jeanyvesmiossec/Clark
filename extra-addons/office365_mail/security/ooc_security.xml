@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record model="ir.module.category" id="module_ooc_category">
+            <field name="name">Outlook Odoo Connector</field>
+            <field name="sequence">16</field>
+        </record>
+
+        <record model="res.groups" id="group_ooc_user">
+            <field name="name">User</field>
+            <field name="category_id" ref="module_ooc_category"/>
+        </record>
+
+        <record model="res.groups" id="group_ooc_manager">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="module_ooc_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_ooc_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <menuitem name="Outlook Connector" id="menu_outlook_connector" groups="group_ooc_manager" sequence="150" parent="base.menu_custom"/>
+        <menuitem action="action_ooc_message_model" id="menu_ooc_message_model" parent="menu_outlook_connector" sequence="150"/>
+        <menuitem action="action_ooc_creation_model" id="menu_ooc_creation_model" parent="menu_outlook_connector" sequence="151"/>
+        <menuitem action="action_ooc_history" id="menu_ooc_history" parent="menu_outlook_connector" sequence="152"/>
+    </data>
+</odoo>

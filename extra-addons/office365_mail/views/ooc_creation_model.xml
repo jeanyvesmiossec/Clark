@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+	<data>
+		<record id="ooc_creation_model_view_tree" model="ir.ui.view">
+			<field name="name">ooc.creation.model.tree.view</field>
+			<field name="model">ooc.creation.model</field>
+			<field name="arch" type="xml">
+				<tree string="Outlook Creation Models">
+					<field name="name" />
+					<field name="model_id" options="{'no_create': True}" />
+				</tree>
+			</field>
+		</record>
+
+		<record id="ooc_creation_model_view_form" model="ir.ui.view">
+			<field name="name">ooc.creation.model.view.form</field>
+			<field name="model">ooc.creation.model</field>
+			<field name="arch" type="xml">
+				<form string="Outlook Creation Model">
+					<sheet>
+						<group>
+							<group>
+								<field name="name" />
+								<field name="model_id" options="{'no_create': True}" />
+							</group>
+						</group>
+						<notebook colspan="4">
+							<page string="Mapping">
+								<group>
+									<group name="subject_input">
+										<field name="subject_field_title" />
+										<field name="subject_field_id" options="{'no_create': True}" domain="[('model_id','=', model_id)]" />
+									</group>
+									<group name="comment_input">
+										<field name="message_field_title" />
+										<field name="message_field_id" options="{'no_create': True}" domain="[('model_id','=', model_id)]" />
+									</group>
+                                    <group name="current_user">
+										<field name="from_email_field_id" options="{'no_create': True}" domain="[('model_id','=', model_id)]" />
+										<field name="from_name_field_id" options="{'no_create': True}" domain="[('model_id','=', model_id)]" />
+										<field name="user_field_id" options="{'no_create': True}" domain="[('model_id','=', model_id)]" />
+									</group>
+								</group>
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record id="ooc_creation_model_view_search" model="ir.ui.view">
+			<field name="name">ooc.creation.model.view.search</field>
+			<field name="model">ooc.creation.model</field>
+			<field name="arch" type="xml">
+				<search string="Search Outlook Creation Models">
+					<field name="name" string="Name" domain="[('model','ilike', self)]" />
+					<field name="model_id" string="Model" domain="[('model','ilike', self)]" />
+				</search>
+			</field>
+		</record>
+
+		<record id="action_ooc_creation_model" model="ir.actions.act_window">
+			<field name="name">Creation Model</field>
+			<field name="res_model">ooc.creation.model</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">
+					Click to define a new model than can be used to create a new object from within Outlook.
+				</p>
+			</field>
+		</record>
+	</data>
+</odoo>

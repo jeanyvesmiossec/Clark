@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--Created:cbbc9d22-5cf7-4e4c-8ee9-42a772aae58a-->
+<OfficeApp xsi:type="MailApp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/office/appforoffice/1.1">
+  <Id>{1c0b8f12-5ac8-4341-934d-bb1bacb442a7}</Id>
+  <Version>0.1.0.1</Version>
+  <ProviderName>Somko</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Odoo Connector" />
+  <Description DefaultValue="This add-in allows you to attach emails to Odoo Objects. " />
+  <IconUrl DefaultValue="{{URL}}/office365_mail/static/src/Images/somko_logo.png" />
+  <SupportUrl DefaultValue="http://www.somko.be/" />
+  <Hosts>
+    <Host Name="Mailbox" />
+  </Hosts>
+  <Requirements>
+    <Sets>
+      <Set Name="MailBox" MinVersion="1.1" />
+    </Sets>
+  </Requirements>
+  <FormSettings>
+    <Form xsi:type="ItemRead">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="{{URL}}/office365_mail/static/src/AppRead/Home/Home.html" />
+        <RequestedHeight>450</RequestedHeight>
+      </DesktopSettings>
+      <TabletSettings>
+        <SourceLocation DefaultValue="{{URL}}/office365_mail/static/src/AppRead/Home/Home.html" />
+        <RequestedHeight>450</RequestedHeight>
+      </TabletSettings>
+      <PhoneSettings>
+        <SourceLocation DefaultValue="{{URL}}/office365_mail/static/src/AppRead/Home/Home.html" />
+      </PhoneSettings>
+    </Form>
+  </FormSettings>
+  <Permissions>ReadWriteMailbox</Permissions>
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read" />
+  </Rule>
+</OfficeApp>

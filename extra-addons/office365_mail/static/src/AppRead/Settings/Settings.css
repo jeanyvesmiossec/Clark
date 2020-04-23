@@ -1,0 +1,13 @@
+﻿.ms-Grid-row {
+	padding: 0 0 10px 0;
+}
+
+#info {
+    position: relative;
+    height: 32px;
+    padding-bottom: 10px;
+}
+
+#spinner, #message-success, #message-error {
+    position: absolute;
+}

@@ -1,0 +1,647 @@
+﻿/*****************************************************************/
+/********************** Office CSS library ***********************/
+/********************** Version: 1.0.2.0 *************************/
+/*****************************************************************/
+
+/******************************************************************
+Base
+******************************************************************/
+body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    height: 100%;
+    max-height: 100%;
+}
+
+/******************************************************************
+Typography
+******************************************************************/
+body {
+    font-family: "Segoe WP", "Segoe UI", "Arial", sans-serif;
+    font-size: 12px;
+    color: #262626;
+}
+
+h1 {
+    font-family: "Segoe WP Light", "Segoe UI", "Arial", sans-serif;
+    font-size: 22px;
+    line-height: 26px;
+    font-weight: 500;
+}
+
+h2, h3, h4, h5, h6, th {
+    font-family: "Segoe WP Semibold", "Segoe UI", "Arial", sans-serif;
+}
+
+h2 {
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: 600;
+}
+
+h3, h4, h5, h6 {
+    font-size: 13px;
+    line-height: 16px;
+}
+
+h3 {
+    font-weight: 600;
+}
+
+h4, h5, h6 {
+    font-weight: normal;
+}
+
+form, input, select, button, textarea {
+    font-family: "Segoe WP", "Segoe UI", "Arial", sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+/******************************************************************
+General
+******************************************************************/
+a {
+    color: #336699;
+    text-decoration: none;
+}
+
+    a:focus, a:hover, a:active {
+        text-decoration: underline;
+    }
+
+ul {
+    margin-left: 1.4em;
+    padding: 0;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    color: #ebebeb;
+    background-color: #ebebeb;
+    clear: both;
+}
+
+img {
+    border: none;
+}
+
+blockquote {
+    margin-left: 1.4em;
+}
+
+/******************************************************************
+Forms
+******************************************************************/
+form {
+    clear: both;
+}
+
+label {
+    margin-right: 3px;
+}
+
+input, textarea, select, button {
+    margin: 0 0 5px 0;
+    padding: 3px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+    input[type="checkbox"], input[type="radio"] {
+        margin-right: 4px;
+    }
+
+    input[type="checkbox"], input[type="radio"],
+    input[type="file"], input[type="image"] {
+        padding: 0;
+    }
+
+    button, textarea, select,
+    input:not([type]),
+    input[type="button"],
+    input[type="color"],
+    input[type="date"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="email"],
+    input[type="month"],
+    input[type="number"],
+    input[type="password"],
+    input[type="reset"],
+    input[type="search"],
+    input[type="submit"],
+    input[type="tel"],
+    input[type="text"],
+    input[type="time"],
+    input[type="url"],
+    input[type="week"] {
+        border: 1px solid #cccccc;
+        background-color: white;
+    }
+
+    button, input[type="button"],
+    input[type="submit"], input[type="reset"] {
+        padding-left: 10px;
+        padding-right: 10px;
+        text-align: center;
+    }
+
+        button:hover:enabled,
+        input[type="button"]:hover:enabled,
+        input[type="submit"]:hover:enabled,
+        input[type="reset"]:hover:enabled {
+            border-color: #7eB4ea;
+            background-color: #e5f1fc;
+        }
+
+        button:active:enabled,
+        input[type="button"]:active:enabled,
+        input[type="submit"]:active:enabled,
+        input[type="reset"]:active:enabled {
+            border-color: #569de5;
+            background-color: #cee5fc;
+        }
+
+/******************************************************************
+Scrollbars
+******************************************************************/
+body {
+    scrollbar-base-color: white;
+    scrollbar-arrow-color: #ababab;
+    scrollbar-highlight-color: #ababab;
+    scrollbar-darkshadow-color: white;
+    scrollbar-track-color: white;
+    scrollbar-face-color: white;
+}
+
+/******************************************************************
+Allignement
+******************************************************************/
+.float-right {
+	float: right;
+}
+
+h1 {
+	display: inline-block;
+}
+
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information. */
+/**
+ * Office UI Fabric 2.6.1
+ * The front-end framework for building experiences for Office 365.
+ **/
+/*Sasssssssss*/
+/*
+  Your use of the content in the files referenced here are subject to the terms of the license at http://aka.ms/fabric-font-license
+*/
+.ms-Table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ms-Table--fixed {
+  table-layout: fixed;
+}
+
+.ms-Table tr,
+.ms-Table-row {
+  display: table-row;
+  line-height: 30px;
+  font-family: 'Segoe UI Semilight WestEuropean', 'Segoe UI Semilight', 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: 12px;
+  color: #333333;
+}
+
+.ms-Table tr:hover,
+.ms-Table-row:hover {
+  background-color: #f4f4f4;
+  cursor: pointer;
+  outline: 1px solid transparent;
+}
+
+.ms-Table tr.is-selected,
+.ms-Table-row.is-selected {
+  background-color: #c7e0f4;
+}
+
+.ms-Table tr.is-selected .ms-Table-rowCheck,
+.ms-Table-row.is-selected .ms-Table-rowCheck {
+  background-color: #0078d7;
+}
+
+.ms-Table tr.is-selected .ms-Table-rowCheck:before,
+.ms-Table-row.is-selected .ms-Table-rowCheck:before {
+  display: none;
+}
+
+.ms-Table tr.is-selected .ms-Table-rowCheck:after,
+.ms-Table-row.is-selected .ms-Table-rowCheck:after {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  font-family: 'Office365Icons';
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  speak: none;
+  content: '\e041';
+  color: #ffffff;
+  font-size: 12px;
+  position: absolute;
+  left: 4px;
+  top: 9px;
+}
+
+.ms-Table th,
+.ms-Table td,
+.ms-Table-cell {
+  display: table-cell;
+  padding: 0 10px;
+}
+
+.ms-Table thead th,
+.ms-Table-head {
+  font-family: 'Segoe UI Semilight WestEuropean', 'Segoe UI Semilight', 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  color: #666666;
+}
+
+.ms-Table thead td,
+.ms-Table thead th,
+.ms-Table thead .ms-Table-cell,
+.ms-Table thead .ms-Table-rowCheck,
+.ms-Table-head td,
+.ms-Table-head th,
+.ms-Table-head .ms-Table-cell,
+.ms-Table-head .ms-Table-rowCheck {
+  font-weight: normal;
+  text-align: left;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.ms-Table thead .ms-Table-rowCheck:after,
+.ms-Table-head .ms-Table-rowCheck:after {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  font-family: 'Office365Icons';
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  speak: none;
+  content: '\e041';
+  color: #a6a6a6;
+  font-size: 12px;
+  position: absolute;
+  left: 4px;
+  top: 9px;
+}
+
+.ms-Table-rowCheck {
+  display: table-cell;
+  width: 20px;
+  position: relative;
+  padding: 0;
+}
+
+.ms-Table-rowCheck:before {
+  border: 1px solid #a6a6a6;
+  content: '';
+  display: block;
+  height: 14px;
+  left: 2px;
+  position: absolute;
+  top: 6px;
+  width: 14px;
+}
+
+@media screen and (-ms-high-contrast: active) {
+  .ms-Table-row.is-selected .ms-Table-rowCheck {
+    background: none;
+  }
+
+  .ms-Table-row.is-selected .ms-Table-rowCheck:before {
+    display: block;
+  }
+}
+
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information. */
+/**
+ * Office UI Fabric 2.6.1
+ * The front-end framework for building experiences for Office 365.
+ **/
+/*Sasssssssss*/
+/*
+  Your use of the content in the files referenced here are subject to the terms of the license at http://aka.ms/fabric-font-license
+*/
+.ms-Button {
+  color: #333333;
+  font-family: 'Segoe UI Regular WestEuropean', 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+  background-color: #f4f4f4;
+  border: 1px solid #f4f4f4;
+  cursor: pointer;
+  display: inline-block;
+  height: 32px;
+  min-width: 80px;
+  padding: 4px 20px 6px;
+}
+
+.ms-Button:hover {
+  background-color: #eaeaea;
+  border-color: #eaeaea;
+  outline: 1px solid transparent;
+}
+
+.ms-Button:hover .ms-Button-label {
+  color: #000000;
+}
+
+.ms-Button:focus {
+  background-color: #eaeaea;
+  border-color: #0078d7;
+  outline: 1px solid transparent;
+}
+
+.ms-Button:focus .ms-Button-label {
+  color: #000000;
+}
+
+.ms-Button:active {
+  background-color: #0078d7;
+  border-color: #0078d7;
+}
+
+.ms-Button:active .ms-Button-label {
+  color: #ffffff;
+}
+
+.ms-Button:disabled,
+.ms-Button.is-disabled {
+  background-color: #f4f4f4;
+  border-color: #f4f4f4;
+  cursor: default;
+}
+
+.ms-Button:disabled .ms-Button-label,
+.ms-Button.is-disabled .ms-Button-label {
+  color: #a6a6a6;
+}
+
+.ms-Button:disabled:hover,
+.ms-Button:disabled:focus,
+.ms-Button.is-disabled:hover,
+.ms-Button.is-disabled:focus {
+  outline: 0;
+}
+
+.ms-Button + .ms-Button {
+  margin-left: 6px;
+}
+
+.ms-Button-label {
+  color: #333333;
+  font-family: 'Segoe UI Semibold WestEuropean', 'Segoe UI Semibold', 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: 14px;
+}
+
+.ms-Button-icon,
+.ms-Button-description {
+  display: none;
+}
+
+.ms-Button.ms-Button--primary {
+  background-color: #0078d7;
+  border-color: #0078d7;
+}
+
+.ms-Button.ms-Button--primary .ms-Button-label {
+  color: #ffffff;
+}
+
+.ms-Button.ms-Button--primary:hover {
+  background-color: #005a9e;
+  border-color: #005a9e;
+}
+
+.ms-Button.ms-Button--primary:focus {
+  background-color: #005a9e;
+  border-color: #004578;
+}
+
+.ms-Button.ms-Button--primary:active {
+  background-color: #0078d7;
+  border-color: #0078d7;
+}
+
+.ms-Button.ms-Button--primary:disabled,
+.ms-Button.ms-Button--primary.is-disabled {
+  background-color: #f4f4f4;
+  border-color: #f4f4f4;
+}
+
+.ms-Button.ms-Button--primary:disabled .ms-Button-label,
+.ms-Button.ms-Button--primary.is-disabled .ms-Button-label {
+  color: #a6a6a6;
+}
+
+.ms-Button.ms-Button--hero {
+  background-color: transparent;
+  border: none;
+  vertical-align: top;
+  line-height: normal;
+}
+
+.ms-Button.ms-Button--hero .ms-Button-icon {
+  color: #0078d7;
+  display: inline-block;
+  font-size: 12px;
+  position: relative;
+  top: -8px;
+  text-align: center;
+}
+
+.ms-Button.ms-Button--hero .ms-Button-icon .ms-Icon {
+  border-radius: 18px;
+  border: 1px solid #0078d7;
+  height: 18px;
+  line-height: 18px;
+  width: 18px;
+  font-size: 12px;
+  margin: 0;
+}
+
+.ms-Button.ms-Button--hero .ms-Button-label {
+  color: #0078d7;
+  font-family: 'Segoe UI Light WestEuropean', 'Segoe UI Light', 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: 21px;
+  position: relative;
+  top: -5px;
+  text-decoration: none;
+}
+
+.ms-Button.ms-Button--hero:hover .ms-Button-icon .ms-Icon,
+.ms-Button.ms-Button--hero:focus .ms-Button-icon .ms-Icon {
+  color: #005a9e;
+}
+
+.ms-Button.ms-Button--hero:hover .ms-Button-label,
+.ms-Button.ms-Button--hero:focus .ms-Button-label {
+  color: #004578;
+}
+
+.ms-Button.ms-Button--hero:active .ms-Button-icon .ms-Icon {
+  color: #0078d7;
+}
+
+.ms-Button.ms-Button--hero:active .ms-Button-label {
+  color: #0078d7;
+}
+
+.ms-Button.ms-Button--hero:disabled .ms-Button-icon .ms-Icon,
+.ms-Button.ms-Button--hero.is-disabled .ms-Button-icon .ms-Icon {
+  color: #c8c8c8;
+}
+
+.ms-Button.ms-Button--hero:disabled .ms-Button-label,
+.ms-Button.ms-Button--hero.is-disabled .ms-Button-label {
+  color: #a6a6a6;
+}
+
+.ms-Button.ms-Button--compound {
+  height: auto; 
+  min-height: 72px;
+  max-width: 280px; 
+  padding: 20px; 
+}
+
+.ms-Button.ms-Button--compound .ms-Button-label {
+  display: block;
+  font-family: 'Segoe UI Semibold WestEuropean', 'Segoe UI Semibold', 'Segoe UI', Tahoma, Arial, sans-serif;
+  position: relative;
+  text-align: left;
+  margin-top: -5px;
+}
+
+.ms-Button.ms-Button--compound .ms-Button-description {
+  color: #666666;
+  display: block;
+  font-family: 'Segoe UI Regular WestEuropean', 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: 12px;
+  position: relative;
+  text-align: left;
+  top: 3px;
+}
+
+.ms-Button.ms-Button--compound:hover .ms-Button-description {
+  color: #212121;
+}
+
+.ms-Button.ms-Button--compound:focus {
+  border-color: #0078d7;
+  background-color: #f4f4f4;
+}
+
+.ms-Button.ms-Button--compound:focus .ms-Button-label {
+  color: #333333;
+}
+
+.ms-Button.ms-Button--compound:focus .ms-Button-description {
+  color: #666666;
+}
+
+.ms-Button.ms-Button--compound:active {
+  background-color: #0078d7;
+}
+
+.ms-Button.ms-Button--compound:active .ms-Button-description,
+.ms-Button.ms-Button--compound:active .ms-Button-label {
+  color: #ffffff;
+}
+
+.ms-Button.ms-Button--compound:disabled .ms-Button-label,
+.ms-Button.ms-Button--compound:disabled .ms-Button-description,
+.ms-Button.ms-Button--compound.is-disabled .ms-Button-label,
+.ms-Button.ms-Button--compound.is-disabled .ms-Button-description {
+  color: #a6a6a6;
+}
+
+.ms-Button.ms-Button--compound:disabled:focus,
+.ms-Button.ms-Button--compound:disabled:active,
+.ms-Button.ms-Button--compound.is-disabled:focus,
+.ms-Button.ms-Button--compound.is-disabled:active {
+  border-color: #f4f4f4;
+  background-color: #f4f4f4;
+}
+
+.ms-Button.ms-Button--compound:disabled:focus .ms-Button-label,
+.ms-Button.ms-Button--compound:disabled:focus .ms-Button-description,
+.ms-Button.ms-Button--compound:disabled:active .ms-Button-label,
+.ms-Button.ms-Button--compound:disabled:active .ms-Button-description,
+.ms-Button.ms-Button--compound.is-disabled:focus .ms-Button-label,
+.ms-Button.ms-Button--compound.is-disabled:focus .ms-Button-description,
+.ms-Button.ms-Button--compound.is-disabled:active .ms-Button-label,
+.ms-Button.ms-Button--compound.is-disabled:active .ms-Button-description {
+  color: #a6a6a6;
+}
+
+.ms-Button.ms-Button--command {
+  background-color: transparent;
+  border: none;
+  height: 32px;
+  line-height: 32px;
+  min-width: 0;
+  padding: 0 8px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.ms-Button.ms-Button--command .ms-Button-icon {
+  color: #666666;
+  display: inline-block;
+  margin-right: 4px;
+  position: relative;
+}
+
+.ms-Button.ms-Button--command .ms-Button-label {
+  font-family: 'Segoe UI Regular WestEuropean', 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+
+.ms-Button.ms-Button--command:hover .ms-Button-icon,
+.ms-Button.ms-Button--command:focus .ms-Button-icon {
+  color: #212121;
+}
+
+.ms-Button.ms-Button--command:hover .ms-Button-label,
+.ms-Button.ms-Button--command:focus .ms-Button-label {
+  color: #000000;
+}
+
+.ms-Button.ms-Button--command:active .ms-Button-icon,
+.ms-Button.ms-Button--command:active .ms-Button-label {
+  color: #0078d7;
+}
+
+.ms-Button.ms-Button--command:disabled .ms-Button-icon,
+.ms-Button.ms-Button--command.is-disabled .ms-Button-icon {
+  color: #c8c8c8;
+}
+
+.ms-Button.ms-Button--command:disabled .ms-Button-label,
+.ms-Button.ms-Button--command.is-disabled .ms-Button-label {
+  color: #a6a6a6;
+}
+
+.ms-Button.ms-Button--command + .ms-Button.ms-Button--command {
+  margin-left: 14px;
+}

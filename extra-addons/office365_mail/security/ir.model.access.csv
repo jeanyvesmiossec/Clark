@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ooc_ooc,ooc.ooc,model_ooc_ooc,group_ooc_user,1,1,1,1
+access_ooc_message_model_user,ooc.message.model,model_ooc_message_model,group_ooc_user,1,0,0,0
+access_ooc_creation_model_user,ooc.creation.model,model_ooc_creation_model,group_ooc_user,1,0,0,0
+access_ooc_message_model_manager,ooc.message.model,model_ooc_message_model,group_ooc_manager,1,1,1,1
+access_ooc_creation_model_manager,ooc.creation.model,model_ooc_creation_model,group_ooc_manager,1,1,1,1
+access_ooc_history_user,ooc.history,model_ooc_history,group_ooc_user,1,1,1,0
+access_ooc_history_manager,ooc.history,model_ooc_history,group_ooc_manager,1,1,1,0

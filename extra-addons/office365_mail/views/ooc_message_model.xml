@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+	<data>
+		<record id="ooc_message_model_view_tree" model="ir.ui.view">
+			<field name="name">ooc.message.model.tree.view</field>
+			<field name="model">ooc.message.model</field>
+			<field name="arch" type="xml">
+				<tree string="Outlook Message Models">
+					<field name="name"/>
+					<field name="model_id"/>
+					<field name="default"/>
+				</tree>
+			</field>
+		</record>
+
+		<record id="ooc_message_model_view_form" model="ir.ui.view">
+			<field name="name">ooc.message.model.view.form</field>
+			<field name="model">ooc.message.model</field>
+			<field name="arch" type="xml">
+				<form string="Outlook Message Model">
+					<sheet>
+						<div class="oe_title">
+							<label for="name" class="oe_edit_only"/>
+							<h1><field name="name"/></h1>
+						</div>
+
+						<group>
+							<group>
+								<field name="model_id"/>
+								<field name="default"/>
+							</group>
+						</group>
+
+						<group string="Auto Select" col="3">
+							<group>
+								<field name="auto_select"/>
+							</group>
+
+							<group colspan="2">
+								<field name="filter_regex" attrs="{'invisible': [('auto_select', '=', False)], 'required': [('auto_select', '=', True)]}"/>
+								<field name="filter_domain" widget="ace" options="{'mode': 'python'}" attrs="{'invisible': [('auto_select', '=', False)], 'required': [('auto_select', '=', True)]}"/>
+							</group>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record id="ooc_message_model_view_search" model="ir.ui.view">
+			<field name="name">ooc.message.model.view.search</field>
+			<field name="model">ooc.message.model</field>
+			<field name="arch" type="xml">
+				<search string="Search Outlook Message Models">
+					<field name="name" string="Display Name" domain="[('model','ilike', self)]" />
+					<field name="model_id" string="Model" domain="[('model','ilike', self)]" />
+				</search>
+			</field>
+		</record>
+
+		<record id="action_ooc_message_model" model="ir.actions.act_window">
+			<field name="name">Message Model</field>
+			<field name="res_model">ooc.message.model</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">
+					Click to define a new model than can be used to attach a message in outlook.
+				</p>
+			</field>
+		</record>
+
+	</data>
+</odoo>
