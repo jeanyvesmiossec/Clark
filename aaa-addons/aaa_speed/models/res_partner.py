@@ -11,6 +11,7 @@ class ResPartner(models.Model):
     is_date_current = fields.Boolean(string="Set current date")
     speed_max = fields.Integer(compute='_compute_speed_week', string="Speed maximum rate", store=True, compute_sudo=True)
     speed_week = fields.Integer(compute='_compute_speed_week', string="Speed week", store=True, compute_sudo=True)
+    speed_week_sec = fields.Integer(compute='_compute_speed_week', string="Speed week sec")
     prospecting = fields.Integer(compute='_compute_speed_week', string="prospecting", store=True, compute_sudo=True)
     candidate = fields.Integer(compute='_compute_speed_week', string="", store=True, compute_sudo=True)
     qualification = fields.Integer(compute='_compute_speed_week', string="qualification", store=True, compute_sudo=True)
@@ -27,6 +28,7 @@ class ResPartner(models.Model):
                  'speed_ids.event_ids.start_datetime', 'speed_ids.event_ids.speed_id')
     def _compute_speed_week(self):
         for partner in self.filtered(lambda part: part.is_business_manager):
+            speed_week_sec = 0
             date = partner.speed_date
             if date:
                 year = date.year
@@ -46,8 +48,13 @@ class ResPartner(models.Model):
                     vals['qualification'] +=  speed.qualification
                     vals['candidate'] +=  speed.candidate
                     vals['prospecting'] +=  speed.prospecting
+                    speed_week_sec += speed.speed_week_sec
                 if not vals['speed_week']:
                     vals['speed_week'] = 1
                 elif vals['speed_week'] > speed_max:
                     vals['speed_week'] = speed_max
                 partner.update(vals)
+                if speed_week_sec = 0:
+                    speed_week_sec = 1
+                else:
+                    partner.speed_week_sec = speed_week_sec

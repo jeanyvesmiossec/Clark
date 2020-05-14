@@ -17,6 +17,7 @@ class CalendarEvent(models.Model):
 
     speed_id = fields.Many2one('speed', compute='_compute_speed_id', string="Speed", store=True, compute_sudo=True)
     coefficient = fields.Integer(compute='_compute_speed_id', string="Coefficient", store=True, compute_sudo=True)
+    coefficient_sec = fields.Integer(compute='_compute_speed_id', string="Coefficient sec",)
 
     @api.multi
     @api.depends('user_id', 'categ_ids', 'start_datetime')
@@ -38,6 +39,7 @@ class CalendarEvent(models.Model):
                                                   'week': week,
                                                   'month': month})
                     event.update({'speed_id': speed.id, 'coefficient': sum([categ.coefficient for categ in event.categ_ids])})
+                    event.coefficient_sec = sum([categ.coefficient for categ in event.categ_ids])
 
     @api.multi
     def unlink(self):
