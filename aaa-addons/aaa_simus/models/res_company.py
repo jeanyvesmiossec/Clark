@@ -10,6 +10,13 @@ import csv
 class ResCompany(models.Model):
     _inherit = "res.company"
 
+    @api.multi
+    def write(self, vals):
+        for company in self:
+            if company.simus_code and vals.get('simus_code'):
+                vals.pop('simus_code')
+        return super(ResCompany, self).write(vals)
+
     @api.model
     def simus_send_email(self, subject, body, user_admin_id):
         mail_obj = self.env['mail.mail'].sudo(user_admin_id)
@@ -277,9 +284,9 @@ class ResCompany(models.Model):
                             val = '<br></br><div>' + "id: %s" % customer_id + " name: " + ustr(name) + " simus_code: %s company_id: %s" % (simus_code, company_id) + '</div>'
                             result['partners_created'] += val
                             result['nb_partners_created'] += 1
-                        user_id = user_logins.get(line[12])
+                        user_id = user_logins.get(line[15])
                         if not user_id:
-                            result['projects_error'] += '<br></br><div>' + "Project error no bm found: %s " % line[12] + ustr(line) + '</div>'
+                            result['projects_error'] += '<br></br><div>' + "Project error no bm found: %s " % line[15] + ustr(line) + '</div>'
                         project_code = line[2]
                         name = line[6]
                         project_data = {'simus_code': project_code,
