@@ -309,7 +309,8 @@ class ResCompany(models.Model):
                         task_code = project_code + " - " + line[14]
                         active = True
                         date_deadline = line[19]
-                        if date_deadline and datetime.strptime(date_deadline, '%Y-%m-%d') < date_now:
+                        min_date = self.env.ref('aaa_simus.simus_project_date_min').value
+                        if date_deadline and datetime.strptime(date_deadline, '%Y-%m-%d') < date_now and datetime.strptime(date_deadline, '%Y-%m-%d') > datetime.strptime(min_date, '%Y-%m-%d'):
                             active = False
                         contact_id = customer_id
                         contact_client = line[27] or line[28] or False
