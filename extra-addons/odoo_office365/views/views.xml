@@ -1,69 +1,83 @@
 <odoo>
+
     <data noupdate="1">
         <record id="my_record_01" model="office.settings">
             <field name="field_name">Office365</field>
         </record>
     </data>
+
     <data noupdate="1">
-        <record id="record_01" model="office.usersettings">
-            <field name="field_name">Office365</field>
+        <record id="record_01" model="office.sync">
+            <field name="field_name">Office</field>
         </record>
     </data>
 
     <data>
-        <record model="ir.ui.view" id="office_form_view">
 
-            <field name="name">office.form</field>
-            <field name="model">office.usersettings</field>
+        <!--       -->
+
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="view_calendar_event_calendar" model="ir.ui.view">
+            <field name="name">calendar.event.calendar</field>
+            <field name="model">calendar.event</field>
+            <field name="priority" eval="3"/>
+<!--            <field name="inherit_id" ref="calendar.view_calendar_event_calendar"/>-->
             <field name="arch" type="xml">
-                <form string="Office365 Settings" create="false" edit="false">
 
-                    <sheet>
-                        <group>
-                            <group>
-                                <h1>ODOO Office365</h1>
-                            </group>
-                            <group>
-                                <group>
+                <calendar string="Meetings" date_start="start" date_stop="stop" date_delay="duration" all_day="allday"
+                          readonly_form_view_id="%(calendar.view_calendar_event_form_popup)s"
+                          event_open_popup="true"
+                          event_limit="3"
+                          color="category_name">
+                    <field name="name"/>
+                    <field name="partner_ids" write_model="calendar.contacts" write_field="partner_id"
+                           avatar_field="image_small"/>
+                    <field name="is_highlighted" invisible="1"/>
+                </calendar>
 
-                                </group>
-                                <group>
-
-                                </group>
-                            </group>
-
-                        </group>
-
-                        <group>
-
-                            <group>
-
-                                <field name="login_url" widget="url" />
-                                <field name="code" />
-
-                            </group>
-
-                            <group>
-                            </group>
-                            <group>
-                                <button name="test_connectiom" type="object" string="Generate Token" class="oe_highlight" icon="fa-refresh fa-2x" style="width:100%" />
-                            </group>
-                        </group>
-                    </sheet>
-                </form>
             </field>
         </record>
-        <record model="ir.actions.act_window" id="office_user_action">
-            <field name="name">practise window</field>
-            <field name="res_model">office.usersettings</field>
-            <field name="res_id" ref="odoo_office365.record_01"/>
-            <field name="view_type">form</field>
-            <field name="view_mode">form</field>
+        <!-- Inherit Form View to Modify it -->
+        <record id="user_token_get_form" model="ir.ui.view">
+            <field name="name">Office365 Token</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+            <field name="arch" type="xml">
 
-            <field name="target">inline</field>
+                <xpath expr="//field[@name='name']" position="after">
+                    <group>
+                        <button name="get_code" type="object" string="Login Office365" class="fa-sign-in oe_highlight"/>
+                    </group>
+                    <group>
+                        <field name='event_del_flag'/>
+                    </group>
+
+                    <!-- Add your fields or attributes here -->
+                </xpath>
+
+            </field>
         </record>
 
-        <record model="ir.ui.view" id="salesforce_form_view">
+        <!--        calendar inherit-->
+        <!-- Inherit Form View to Modify it -->
+        <record id="inherit_calendar_form" model="ir.ui.view">
+            <field name="name">calendar.event.form</field>
+            <field name="model">calendar.event</field>
+            <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+            <field name="arch" type="xml">
+
+
+                <xpath expr="//field[@name='categ_ids']" position="replace">
+                    <!-- Add your fields or attributes here -->
+                    <field name="categ_ids" widget="many2many_tags"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="office365_form_view">
             <field name="name">office.form</field>
             <field name="model">office.settings</field>
             <field name="arch" type="xml">
@@ -76,12 +90,11 @@
                         </group>
                         <group>
                             <group>
-                                <field name="redirect_url" />
-                                <field name="client_id" />
-                                <field name="secret" password="True" />
-                            </group>
-                            <group>
-                                <button name="sync_data" type="object" string="Activate" class="oe_highlight" style="width:20%" />
+                                <field name="redirect_url"/>
+                                <field name="client_id"/>
+                                <field name="secret" password="True"/>
+                                <button name="save_data" type="object" string="Save" class="oe_highlight"
+                                        style="width:20%"/>
                             </group>
                         </group>
                     </sheet>
@@ -89,69 +102,30 @@
             </field>
         </record>
         <record model="ir.actions.act_window" id="office_action">
-            <field name="name">practise window</field>
+            <field name="name">Office365 Settings</field>
             <field name="res_model">office.settings</field>
-            <field name="res_id" ref="odoo_office365.my_record_01"/>
-            <field name="view_type">form</field>
             <field name="view_mode">form</field>
-
+            <field name="res_id" ref="odoo_office365.my_record_01"/>
             <field name="target">inline</field>
         </record>
-        <record model="ir.ui.view" id="custom_user_form_view">
-            <field name="name">user.custom_user</field>
-            <field name="model">res.users</field>
-            <field name="inherit_id" ref="base.view_users_form" />
-            <field name="arch" type="xml">
-                <notebook position="inside">
-                    <page string="Office365">
-                        <group>
-                            <field name="code" />
-                            <field name="office365_email" />
-                            <field name="office365_id_address" />
-                        </group>
-                    </page>
-                    <page string="Office365 Calendar">
-                        <div>
-                            <group>
-                                <button string="Sync Office365 Calendar to ODOO" type="object" name="import_calendar" class="oe_highlight" />
-                                <button string="Sync ODOO Calendar to Office365" type="object" name="export_calendar" class="oe_highlight" />
-                            </group>
-                        </div>
 
-                    </page>
-                    <page string="Office365 Mail and Contact">
-                        <div>
-                            <group>
-                                <!--<button string="Import Users Mails" type="object" name="sync_mail"-->
-                                <group>
-                                    <!--class="oe_highlight"/>-->
-                                    <button string="Import Customers Mails" type="object" name="sync_customer_mail" class="oe_highlight" />
 
-                                </group>
-
-                                <group>
-                                    <button string="Export Contacts to Office365" type="object" name="export_contacts" class="oe_highlight" />
-                                    <button string="Import Contacts From Office365 " type="object" name="import_contacts" class="oe_highlight" />
-                                </group>
-                            </group>
-                            <group>
-                                <field name="send_mail_flag" />
-                            </group>
-                        </div>
-                    </page>
-                    <page string="Office365 Task">
-                        <div>
-                            <group>
-                                <button string="Import Tasks From Office365 to ODOO" type="object" name="import_tasks" class="oe_highlight" />
-                                <button string="Export Tasks From ODOO to Office365" type="object" name="export_tasks" class="oe_highlight" />
-                            </group>
-                        </div>
-                    </page>
-                </notebook>
-            </field>
+        <record id="sync_office_action" model="ir.actions.act_window">
+            <field name="name">office365 Sync Mail and Contact</field>
+            <field name="res_model">office.sync</field>
+            <field name="view_mode">form</field>
+            <field name="res_id" ref="odoo_office365.record_01"/>
+            <field name="target">inline</field>
         </record>
-        <menuitem id="office365_menu" web_icon="odoo_office365,static/description/icon.jpg" name="Office365" parent="base.menu_users" action="office_action" />
-        <menuitem id="main_office_menu" web_icon="odoo_office365,static/description/icon.jpg" name="Office365 Settings" groups="base.group_user" />
-        <menuitem id="office_menu" web_icon="odoo_office365,static/description/icon.jpg" name="Office365 Settings" parent="main_office_menu" action="office_user_action" />
+
+        <menuitem id="office365_menu" name="Office365 Credential"
+                  parent="base.menu_users" action="office_action"/>
+        <menuitem id="main_office_menu" web_icon="odoo_office365,static/description/icon.png" name="Office365 "
+                  groups="base.group_user"/>
+        <menuitem id="office365_sync_menu" name="Office365" parent="main_office_menu" action="sync_office_action"
+                  sequence="10"/>
+
     </data>
+
 </odoo>
+

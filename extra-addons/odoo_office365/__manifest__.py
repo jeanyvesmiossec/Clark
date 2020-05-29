@@ -14,17 +14,19 @@
     'category': 'sale',
     'price': 499,
     'currency': 'EUR',
-    'version': '12.0.0.1.2',
-    'license' : 'OPL-1', 
+    'version': '12.0.0.2.2',
+    'license' : 'OPL-1',
     'depends': ['base', 'calendar', 'crm'],
     'images': [
         'static/description/banner.png',
     ],
     'data': [
-        #'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/views.xml',
         'data/scheduler.xml',
         'wizard/message_wizard.xml',
+        'views/template.xml',
+        'views/office365_sync.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
