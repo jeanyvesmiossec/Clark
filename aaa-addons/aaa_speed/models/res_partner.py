@@ -54,7 +54,4 @@ class ResPartner(models.Model):
                 elif vals['speed_week'] > speed_max:
                     vals['speed_week'] = speed_max
                 partner.update(vals)
-                if speed_week_sec = 0:
-                    speed_week_sec = 1
-                else:
-                    partner.speed_week_sec = speed_week_sec
+                partner.speed_week_sec = speed_week_sec or 1

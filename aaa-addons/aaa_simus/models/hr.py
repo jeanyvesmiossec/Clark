@@ -3,6 +3,8 @@
 from odoo import models, api, _
 from datetime import datetime
 from odoo.tools import ustr
+import ftplib as ftp
+import pysftp
 
 
 class HrEmployee(models.Model):
@@ -71,6 +73,19 @@ class HrEmployee(models.Model):
                         result['nb_employees_updated'] += 1
                     else:
                         employee = self.create(data)
+                        data_consultant = {
+                            'company_id': company_id,
+                            'lastname': line[7],
+                            'firstname': line[8],
+                            'simus_code': simus_code,
+                            'mobile':line[19],
+                            'phone':line[18],
+                            'email':work_email,
+                            'consultant': True,
+                        }
+                        if employee.job_id.name == 'Consultant':
+                            consultant_id = self.env['res.partner'].create(data_consultant)
+                            self.env.user.company_id.create_consultant_public_user()
                         employee_id = employee.id
                         val = '<br></br><div>' + "id: %s " % employee_id + " name: " + ustr(name) + " simus_code: %s company_id: %s" % (simus_code, company_id) + '</div>'
                         result['employees_created'] += val

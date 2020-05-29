@@ -11,6 +11,7 @@ class Speed(models.Model):
 
     user_id = fields.Many2one('res.users', string="User")
     partner_id = fields.Many2one('res.partner', related='user_id.partner_id', string="Partner", store=True, compute_sudo=True)
+    team_id = fields.Many2one('crm.team', compute='_compute_speed_week', string="CRM Team", store=True, compute_sudo=True)
     event_ids = fields.One2many('calendar.event', 'speed_id', string="Speeds")
     year = fields.Integer(string="Year")
     month = fields.Integer(string="Month")
@@ -39,8 +40,13 @@ class Speed(models.Model):
                 coefficient = event.coefficient or 0
                 vals['speed_week'] += coefficient
                 speed_week_sec += event.coefficient_sec
-                speed_type = event.categ_ids.speed_type
-                if speed_type:
-                    vals[speed_type] += coefficient
+            vals['speed_week_sec'] = speed_week_sec
+            if speed.user_id:
+                crm_team = self.env['crm.team'].search([('member_ids','in',speed.user_id.ids)])
+                if crm_team:
+                    vals['team_id']= crm_team.id
+                #speed_type = event.categ_ids.speed_type
+                #if speed_type:
+                    #vals[speed_type] += coefficient
             speed.update(vals)
-            speed.speed_week_sec = speed_week_sec
+                

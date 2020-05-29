@@ -26,6 +26,22 @@
             <field name="key">simus.project.date.minimum</field>
             <field name="value">2019-01-01</field>
         </record>
+        <record model="ir.config_parameter" id="simus_domain_name" forcecreate="True">
+            <field name="key">simus.domain.ip</field>
+            <field name="value">51.75.192.210</field>
+        </record>
+        <record model="ir.config_parameter" id="simus_user" forcecreate="True">
+            <field name="key">simus.sftp.user</field>
+            <field name="value">simus</field>
+        </record>
+        <record model="ir.config_parameter" id="simus_password" forcecreate="True">
+            <field name="key">simus.user.password</field>
+            <field name="value">password</field>
+        </record>
+        <record model="ir.config_parameter" id="simus_origin_path" forcecreate="True">
+            <field name="key">simus.origin.path</field>
+            <field name="value">password</field>
+        </record>
 
     </data>
 </odoo>

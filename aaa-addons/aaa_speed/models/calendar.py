@@ -34,7 +34,7 @@ class CalendarEvent(models.Model):
                     week = date.isocalendar()[1]
                     speed = speed_obj.search([('user_id', '=', user_id), ('year', '=', year), ('week', '=', week), ], limit=1)
                     if not speed:
-                        speed = speed_obj.create({'user_id': user_id,
+                        speed = speed_obj.sudo().create({'user_id': user_id,
                                                   'year': year,
                                                   'week': week,
                                                   'month': month})

@@ -11,13 +11,14 @@ class ResUsers(models.Model):
 
     simus_code = fields.Char(string="Simus code", related='partner_id.simus_code', store=True, compute_sudo=True)
     login_simus = fields.Char(string="Login simus")
-
+    
     @api.model
     def simus_business_manager(self, cr, lines, company_simus_codes, users_login, users_simus_code, employee_obj):
         datetime_now = datetime.now()
         result = {'nb_lines': len(lines), 'nb_users_created': 0, 'nb_users_updated': 0, 'nb_employees_created': 0,
                   'nb_employees_updated': 0, 'users_error': "", 'users_created': "", 'employees_created': ""}
         for line in lines:
+            
             try:
                 company = company_simus_codes.get(line[1])
                 if company:

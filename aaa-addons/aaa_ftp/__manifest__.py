@@ -1,28 +1,26 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'AAA Simus',
+    'name': 'AAA FTP SIMUS',
     'installed_version': '12.0.1.1',
     'author': 'Auguria SAS',
     'licence': 'LGPL Version 3',
-    'summary': 'AAA Simus',
+    'summary': 'AAA FTP',
     'sequence': 15,
     'description': """
-AAA Simus
+AAA FTP SIMUS
     """,
     'category': '',
     'website': 'https://www.auguria.fr',
     'images': [],
     'depends': [
                 'base',
-                'aaa_base',
-                'aaa_hr',
-                'aaa_project',
-                'aaa_mail',
-#                 'aaa_employee_firstname',
         ],
     'data': [
-            'data/ir_cron.xml',
-            'data/ir_config_parameter.xml',
+            'security/ir.model.access.csv',
+            'data/res_ftp_data.xml',
+            'views/res_ftp.xml',
+            #'data/ir_cron.xml',
+            #'data/ir_config_parameter.xml',
             #'views/res_company.xml',
     ],
     'demo': [
