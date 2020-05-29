@@ -192,7 +192,7 @@ class ResCompany(models.Model):
             #if 'commit_error' not in result:
                # values = ""
                 #for val in ['nb_lines', 'nb_partners_created', 'nb_partners_updated', 'partners_created', 'partners_error']:
-                    #values += '<div style="margin: 0px; padding: 0px;">' + val + ': ' + ustr(result[val]) + "</div>"
+                    #values += '<div style="margin: 0px; padding: 0px;">' + val + ': :' + ustr(result[val]) + "</div>"
             #else:
                 #values = "Externals Commit Error" + ustr(result['commit_error'])
             self.simus_send_email('Import externals', values, user_admin_id)
