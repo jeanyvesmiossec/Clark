@@ -221,6 +221,7 @@ class ResCompany(models.Model):
                 
                 date_end = self.env.ref('aaa_simus.simus_project_date_min').sudo().value
                 for line in projects_reader:
+<<<<<<< HEAD
                     if line[1] == 'Identifiant cabinet':
                         pass
                     else:
@@ -340,3 +341,158 @@ class ResCompany(models.Model):
                 user.write({'groups_id':[(5,0,0)]})                
                 public_group_id = self.env.ref('base.group_public').sudo().id
                 user.write({'groups_id': [(4, public_group_id)]})
+=======
+                    date_end_project = line[5]
+                    if line[0] and date_end_project and date_end_project >= date_end:
+                        lines += [line]
+            company_simus_codes = {}
+            company_id_simus_codes = {}
+            for company in self.search_read([], ['simus_code']):
+                simus_code = company['simus_code']
+                if simus_code:
+                    company_id = company['id']
+                    company_id_simus_codes[company_id] = simus_code
+                    company_simus_codes[company['simus_code']] = {'id': company_id,
+                                                                  'partner_simus_codes': {},
+                                                                  'project_simus_code': {},
+                                                                  'task_simus_code': {}}
+            user_logins = {}
+            company_user_bms = {}
+            for user in user_obj.with_context(active_test=False).search_read([], ['login_simus', 'is_business_manager',
+                                                                                  'company_ids', 'active']):
+                user_id = user['id']
+                user_logins[user['login_simus']] = user['id']
+                is_business_manager = user['is_business_manager']
+                if is_business_manager:
+                    for company in user['company_ids']:
+                        if company in company_user_bms:
+                            company_user_bms[company] += [{'user_id': user_id, 'active': user['active']}]
+                        else:
+                            company_user_bms[company] = [{'user_id': user_id, 'active': user['active']}]
+            for partner in partner_obj.with_context(active_test=False).search_read([('is_business_manager', '!=', True)],
+                                                                                   ['simus_code', 'company_id']):
+                company_id = partner['company_id'] and partner['company_id'][0]
+                simus_code = partner['simus_code']
+                if company_id and simus_code:
+                    company_simus_codes[company_id_simus_codes[company_id]]['partner_simus_codes'][simus_code] = partner['id']
+            for project in project_obj.with_context(active_test=False).search_read([], ['simus_code', 'company_id']):
+                company_id = project['company_id'] and project['company_id'][0]
+                simus_code = project['simus_code']
+                if company_id and simus_code:
+                    company_simus_codes[company_id_simus_codes[company_id]]['project_simus_code'][simus_code] = project['id']
+            for task in task_obj.with_context(active_test=False).search_read([], ['simus_code', 'company_id']):
+                company_id = task['company_id'] and task['company_id'][0]
+                simus_code = task['simus_code']
+                if company_id and simus_code:
+                    company_simus_codes[company_id_simus_codes[company_id]]['task_simus_code'][simus_code] = task['id']
+            date_now = datetime.now()
+            result = {'nb_lines': len(lines), 'nb_projects_created': 0, 'nb_projects_updated': 0, 'nb_tasks_created': 0,
+                      'nb_tasks_updated': 0, 'nb_partners_created': 0, 'nb_partners_updated': 0, 'projects_error': "",
+                      'projects_created': "", 'tasks_created': "", 'partners_created': ""}
+            for line in lines:
+                company = company_simus_codes.get(line[1])
+                if company:
+                    try:
+                        simus_code = line[9]
+                        company_id = company['id']
+                        name = line[8]
+                        partner_data = {'simus_code': simus_code,
+                                        'company_id': company_id,
+                                        'lastname': name,
+                                        'firstname': '',
+                                        'customer': True,
+                                        'is_company': True}
+                        customer_id = company['partner_simus_codes'].get(simus_code)
+                        if customer_id:
+                            partner_obj.with_context(active_test=False).browse(customer_id).write(partner_data)
+                            result['nb_partners_updated'] += 1
+                        else:
+                            customer = partner_obj.create(partner_data)
+                            customer_id = customer.id
+                            company['partner_simus_codes'][simus_code] = customer_id
+                            val = '<br></br><div>' + "id: %s" % customer_id + " name: " + ustr(name) + " simus_code: %s company_id: %s" % (simus_code, company_id) + '</div>'
+                            result['partners_created'] += val
+                            result['nb_partners_created'] += 1
+                        user_id = user_logins.get(line[15])
+                        if not user_id:
+                            result['projects_error'] += '<br></br><div>' + "Project error no bm found: %s " % line[15] + ustr(line) + '</div>'
+                        project_code = line[2]
+                        name = line[6]
+                        project_data = {'simus_code': project_code,
+                                        'partner_id': customer_id,
+                                        'company_id': company_id,
+                                        'user_id': user_id,
+                                        'name': name,
+                                        'description': line[7]}
+                        project_id = company['project_simus_code'].get(project_code)
+                        if project_id:
+                            project_obj.with_context(active_test=False).browse(project_id).write(project_data)
+                            result['nb_projects_updated'] += 1
+                        else:
+                            project = project_obj.create(project_data)
+                            project_id = project.id
+                            company['project_simus_code'][project_code] = project.id
+                            val = '<br></br><div>' + "id: %s" % project_id + " name: " + ustr(name) + " simus_code: %s company_id: %s" % (project_code, company_id) + '</div>'
+                            result['projects_created'] += val
+                            result['nb_projects_created'] += 1
+                        task_code = project_code + " - " + line[14]
+                        active = True
+                        date_deadline = line[19]
+                        min_date = self.env.ref('aaa_simus.simus_project_date_min').value
+                        if date_deadline and datetime.strptime(date_deadline, '%Y-%m-%d') < date_now and datetime.strptime(date_deadline, '%Y-%m-%d') > datetime.strptime(min_date, '%Y-%m-%d'):
+                            active = False
+                        contact_id = customer_id
+                        contact_client = line[27] or line[28] or False
+                        if contact_client:
+                            partners = partner_obj.with_context(active_test=False).browse(customer_id).child_ids
+                            if partners:
+                                res = self.get_contact_name(partners, contact_client)
+                                if res:
+                                    contact_id = res
+                        name = line[6]
+                        user_id = user_logins.get(line[15])
+                        if not user_id:
+                            result['projects_error'] += '<br></br><div>' + "Task error no consultant found: %s " % line[15] + ustr(line) + '</div>'
+                        data_task = {'simus_code': task_code,
+                                     'partner_id': contact_id,
+                                     'company_id': company_id,
+                                     'project_id': project_id,
+                                     'user_id': user_id,
+                                     'code_type': 'mission',
+                                     'date_start': line[18],
+                                     'date_deadline': date_deadline,
+                                     'active': active,
+                                     'name': name,
+                                     'description': line[7]}
+                        task_id = company['task_simus_code'].get(task_code)
+                        if task_id:
+                            task_obj.with_context(active_test=False).browse(task_id).write(data_task)
+                            result['nb_tasks_updated'] += 1
+                        else:
+                            task = task_obj.create(data_task)
+                            task_id = task.id
+                            company['task_simus_code'][task_code] = task_id
+                            val = '<br></br><div>' + "id: %s" % task_id + " name: " + ustr(name) + " simus_code: %s company_id: %s" % (task_code, company_id) + '</div>'
+                            result['tasks_created'] += val
+                            result['nb_tasks_created'] += 1
+                    except Exception as e:
+                        val = '<br></br><div>' + "Projects tasks error: " + ustr(line) + "</div><br></br><div>" + "error: " + ustr(e) + '</div>'
+                        result['projects_error'] += val
+                        continue
+                else:
+                    result['projects_error'] += '<br></br><div>' + "Projects tasks error no company found: " + ustr(line) + '</div>'
+            try:
+                if lines:
+                    self._cr.commit()
+            except Exception as e:
+                result['commit_error'] = e
+            if 'commit_error' not in result:
+                values = ""
+                for val in ['nb_lines', 'nb_partners_created', 'nb_partners_updated', 'nb_projects_created', 'nb_projects_updated',
+                            'nb_tasks_created', 'nb_tasks_updated', 'partners_created', 'projects_created', 'tasks_created',
+                            'projects_error']:
+                    values += '<div style="margin: 0px; padding: 0px;">' + val + ': ' + ustr(result[val]) + "</div>"
+            else:
+                values = "Projects Commit Error" + ustr(result['commit_error'])
+            self.simus_send_email('Import projects', values, self.env.ref('base.user_admin').id)
+>>>>>>> 19ccc49971417028c0b7876d0a8915687824eb9b
