@@ -279,8 +279,7 @@ class Office365(models.Model):
                 self.env.cr.commit()
 
         else:
-            raise osv.except_osv(_("Token missing!")(_("Token not found!\
-             Please Go to user preference from left corner and login Office365 Account ")))
+            raise Warning("Token not found! Please Go to user preference from left corner and login Office365 Account ")
 
     def get_office365_event(self,url,res_user,categ_name=None):
         update_event = []
@@ -313,93 +312,95 @@ class Office365(models.Model):
                         if 'categories' in event and  event['categories']:
                             categ_id = self.get_categ_id(event)
                         if odoo_meeting:
-                            _logger.info('Office365: Updating event {} In Odoo'.format(event['id']))
-                            odoo_meeting.write({
-                                'office_id': event['id'],
-                                'name': event['subject'],
-                                'category_name': event['categories'][0] if 'categories' in event else None,
-                                "description": event['bodyPreview'],
-                                'location': (event['location']['address']['city'] + ', ' + event['location']['address'][
-                                    'countryOrRegion']) if 'address' in event['location'] and 'city' in
-                                                           event['location'][
-                                                               'address'].keys() else "",
-                                'start': datetime.strptime(event['start']['dateTime'][:-8], '%Y-%m-%dT%H:%M:%S'),
-                                'stop': datetime.strptime(event['end']['dateTime'][:-8], '%Y-%m-%dT%H:%M:%S'),
-                                'allday': event['isAllDay'],
-                                'categ_ids': [(6,0,categ_id)] if categ_id else None,
-                                'show_as': event['showAs'] if 'showAs' in event and (
-                                        event['showAs'] == 'free' or event['showAs'] == 'busy') else None,
-                                'recurrency': True if event['recurrence'] else False,
-                                'end_type': 'end_date' if event['recurrence'] else "",
-                                'rrule_type': event['recurrence']['pattern']['type'].replace('absolute', '').lower() if
-                                event[
-                                    'recurrence'] else "",
-                                'count': event['recurrence']['range']['numberOfOccurrences'] if event[
-                                    'recurrence'] else "",
-                                'final_date': datetime.strptime(event['recurrence']['range']['endDate'],
-                                                                '%Y-%m-%d').strftime(
-                                    '%Y-%m-%d') if event['recurrence'] else None,
-                                'mo': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
-                                    'pattern'].keys() and 'monday' in event['recurrence']['pattern'][
-                                                  'daysOfWeek'] else False,
-                                'tu': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
-                                    'pattern'].keys() and 'tuesday' in event['recurrence']['pattern'][
-                                                  'daysOfWeek'] else False,
-                                'we': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
-                                    'pattern'].keys() and 'wednesday' in event['recurrence']['pattern'][
-                                                  'daysOfWeek'] else False,
-                                'th': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
-                                    'pattern'].keys() and 'thursday' in event['recurrence']['pattern'][
-                                                  'daysOfWeek'] else False,
-                                'fr': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
-                                    'pattern'].keys() and 'friday' in event['recurrence']['pattern'][
-                                                  'daysOfWeek'] else False,
-                                'sa': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
-                                    'pattern'].keys() and 'saturday' in event['recurrence']['pattern'][
-                                                  'daysOfWeek'] else False,
-                                'su': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
-                                    'pattern'].keys() and 'sunday' in event['recurrence']['pattern'][
-                                                  'daysOfWeek'] else False,
-                            })
-
-
-                            partner_ids = []
-                            attendee_ids = []
-                            for attendee in event['attendees']:
-                                partner = self.env['res.partner'].search(
-                                    [('email', "=", attendee['emailAddress']['address'])])
-                                if not partner:
-                                    _logger.info('Office365: Creating attendee {} in ODOO'.format(
-                                        ttendee['emailAddress']['address']))
-                                    partner = self.env['res.partner'].create({
-                                        'name': attendee['emailAddress']['name'],
-                                        'email': attendee['emailAddress']['address'],
-                                    })
-                                partner_ids.append(partner[0].id)
-                                odoo_attendee = self.env['calendar.attendee'].create({
-                                    'partner_id': partner[0].id,
-                                    'event_id': odoo_meeting.id,
-                                    'email': attendee['emailAddress']['address'],
-                                    'common_name': attendee['emailAddress']['name'],
-
-                                })
-                                attendee_ids.append(odoo_attendee.id)
-                                if not event['attendees']:
-                                    odoo_attendee = self.env['calendar.attendee'].create({
-                                        'partner_id': res_user.partner_id.id,
-                                        'event_id': odoo_meeting.id,
-                                        'email': res_user.partner_id.email,
-                                        'common_name': res_user.partner_id.name,
-
-                                    })
-                                attendee_ids.append(odoo_attendee.id)
-                                partner_ids.append(res_user.partner_id.id)
+                            if datetime.strptime(event['lastModifiedDateTime'][:-9],"%Y-%m-%dT%H:%M:%S")!= odoo_meeting.modified_date:
+                                _logger.info('Office365: Updating event {} In Odoo'.format(event['id']))
                                 odoo_meeting.write({
-                                    'attendee_ids': [[6, 0, attendee_ids]],
-                                    'partner_ids': [[6, 0, partner_ids]]
+                                    'office_id': event['id'],
+                                    'name': event['subject'],
+                                    'category_name': event['categories'][0] if 'categories' in event and event['categories'] else None,
+                                    "description": event['bodyPreview'],
+                                    'location': (event['location']['address']['city'] + ', ' + event['location']['address'][
+                                        'countryOrRegion']) if 'address' in event['location'] and 'city' in
+                                                               event['location'][
+                                                                   'address'].keys() else "",
+                                    'start': datetime.strptime(event['start']['dateTime'][:-8], '%Y-%m-%dT%H:%M:%S'),
+                                    'stop': datetime.strptime(event['end']['dateTime'][:-8], '%Y-%m-%dT%H:%M:%S'),
+                                    'allday': event['isAllDay'],
+                                    'categ_ids': [(6,0,categ_id)] if categ_id else None,
+                                    'show_as': event['showAs'] if 'showAs' in event and (
+                                            event['showAs'] == 'free' or event['showAs'] == 'busy') else None,
+                                    'recurrency': True if event['recurrence'] else False,
+                                    'end_type': 'end_date' if event['recurrence'] else "",
+                                    'rrule_type': event['recurrence']['pattern']['type'].replace('absolute', '').lower() if
+                                    event[
+                                        'recurrence'] else "",
+                                    'count': event['recurrence']['range']['numberOfOccurrences'] if event[
+                                        'recurrence'] else "",
+                                    'final_date': datetime.strptime(event['recurrence']['range']['endDate'],
+                                                                    '%Y-%m-%d').strftime(
+                                        '%Y-%m-%d') if event['recurrence'] else None,
+                                    'mo': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
+                                        'pattern'].keys() and 'monday' in event['recurrence']['pattern'][
+                                                      'daysOfWeek'] else False,
+                                    'tu': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
+                                        'pattern'].keys() and 'tuesday' in event['recurrence']['pattern'][
+                                                      'daysOfWeek'] else False,
+                                    'we': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
+                                        'pattern'].keys() and 'wednesday' in event['recurrence']['pattern'][
+                                                      'daysOfWeek'] else False,
+                                    'th': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
+                                        'pattern'].keys() and 'thursday' in event['recurrence']['pattern'][
+                                                      'daysOfWeek'] else False,
+                                    'fr': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
+                                        'pattern'].keys() and 'friday' in event['recurrence']['pattern'][
+                                                      'daysOfWeek'] else False,
+                                    'sa': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
+                                        'pattern'].keys() and 'saturday' in event['recurrence']['pattern'][
+                                                      'daysOfWeek'] else False,
+                                    'su': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
+                                        'pattern'].keys() and 'sunday' in event['recurrence']['pattern'][
+                                                      'daysOfWeek'] else False,
+                                    'modified_date': datetime.strptime(event['lastModifiedDateTime'][:-9],"%Y-%m-%dT%H:%M:%S")
                                 })
-                                self.env.cr.commit()
-                            update_event.append(odoo_meeting.id)
+
+
+                                partner_ids = []
+                                attendee_ids = []
+                                for attendee in event['attendees']:
+                                    partner = self.env['res.partner'].search(
+                                        [('email', "=", attendee['emailAddress']['address'])])
+                                    if not partner:
+                                        _logger.info('Office365: Creating attendee {} in ODOO'.format(
+                                            attendee['emailAddress']['address']))
+                                        partner = self.env['res.partner'].create({
+                                            'name': attendee['emailAddress']['name'],
+                                            'email': attendee['emailAddress']['address'],
+                                        })
+                                    partner_ids.append(partner[0].id)
+                                    odoo_attendee = self.env['calendar.attendee'].create({
+                                        'partner_id': partner[0].id,
+                                        'event_id': odoo_meeting.id,
+                                        'email': attendee['emailAddress']['address'],
+                                        'common_name': attendee['emailAddress']['name'],
+
+                                    })
+                                    attendee_ids.append(odoo_attendee.id)
+                                    if not event['attendees']:
+                                        odoo_attendee = self.env['calendar.attendee'].create({
+                                            'partner_id': res_user.partner_id.id,
+                                            'event_id': odoo_meeting.id,
+                                            'email': res_user.partner_id.email,
+                                            'common_name': res_user.partner_id.name,
+
+                                        })
+                                    attendee_ids.append(odoo_attendee.id)
+                                    partner_ids.append(res_user.partner_id.id)
+                                    odoo_meeting.write({
+                                        'attendee_ids': [[6, 0, attendee_ids]],
+                                        'partner_ids': [[6, 0, partner_ids]]
+                                    })
+                                    self.env.cr.commit()
+                                update_event.append(odoo_meeting.id)
 
                             # odoo_meeting.unlink()
                             # self.env.cr.commit()
@@ -408,7 +409,7 @@ class Office365(models.Model):
                             odoo_event = self.env['calendar.event'].create({
                                 'office_id': event['id'],
                                 'name': event['subject'],
-                                'category_name': event['categories'][0] if 'categories' in event else None,
+                                'category_name': event['categories'][0] if 'categories' in event and event['categories'] else None,
                                 "description": event['bodyPreview'],
                                 'location': (event['location']['address']['city'] + ', ' + event['location']['address'][
                                     'countryOrRegion']) if 'address' in event['location'] and 'city' in
@@ -452,6 +453,7 @@ class Office365(models.Model):
                                 'su': True if event['recurrence'] and 'daysOfWeek' in event['recurrence'][
                                     'pattern'].keys() and 'sunday' in event['recurrence']['pattern'][
                                                   'daysOfWeek'] else False,
+                                'modified_date' : datetime.strptime(event['lastModifiedDateTime'][:-9],"%Y-%m-%dT%H:%M:%S")
                             })
 
                             partner_ids = []
@@ -523,6 +525,26 @@ class Office365(models.Model):
                     if nowDateTime > expires_in:
                         self.generate_refresh_token()
 
+                if is_manual:
+                    if self.from_date and not self.to_date:
+                        raise Warning('Please! Select "To Date" to Import Events.')
+                    if self.from_date and self.to_date:
+                        from_date = self.from_date
+                        to_date = self.to_date
+                    else:
+                        if res_user.last_calender_import:
+                            from_date = res_user.last_calender_import
+                            to_date = datetime.now()
+
+                else:
+                    custom_data = self.env['office.sync'].search([])[0]
+                    if custom_data.from_date and custom_data.to_date:
+                        from_date = custom_data.from_date
+                        to_date = custom_data.to_date
+                    elif res_user.last_contact_import:
+                        from_date = res_user.last_contact_import
+                        to_date = datetime.now()
+
                 header = {
                     'Authorization': 'Bearer {0}'.format(res_user.token),
                     'Content-Type': 'application/json'
@@ -542,6 +564,8 @@ class Office365(models.Model):
                 calendar_id = calendars[0]['id']
 
                 meetings = self.env['calendar.event'].search([("create_uid", '=', res_user.id)])
+                if from_date and to_date:
+                    meetings = meetings.search([('write_date', '>=', from_date), ('write_date', '<=', to_date)])
                 added_meetings = self.env['calendar.event'].search(
                     [("office_id", "!=", False), ("create_uid", '=', res_user.id)])
 
@@ -613,12 +637,14 @@ class Office365(models.Model):
                                 temp.write({
                                     'office_id': json.loads((response.decode('utf-8')))['id']
                                 })
+                                temp.is_update = False
                                 self.env.cr.commit()
                                 export_event.append(json.loads((response.decode('utf-8')))['id'])
                                 if meeting.recurrency:
                                     added.append(meeting.name)
 
-                        else:
+                        elif meeting.is_update:
+
                             response = requests.patch(
                                 'https://graph.microsoft.com/v1.0/me/calendars/' + calendar_id + '/events/' + meeting.office_id,
                                 headers=header, data=json.dumps(payload)).content
@@ -627,6 +653,7 @@ class Office365(models.Model):
                                     'office_id': json.loads((response.decode('utf-8')))['id']
                                 })
                                 update_event.append(json.loads((response.decode('utf-8')))['id'])
+                                meeting.is_update =False
                                 self.env.cr.commit()
                                 if meeting.recurrency:
                                     added.append(meeting.name)
@@ -849,23 +876,29 @@ class Office365(models.Model):
                                 'note': task['body']['content'],
                                 'res_model_id': partner_model.id,
                                 'office_id': task['id'],
+                                'modifed_date':datetime.strptime(task['lastModifiedDateTime'][:-9],
+                                                 "%Y-%m-%dT%H:%M:%S")
                             })
                             new_task.append(task['id'])
                         elif self.env['mail.activity'].search([('office_id', '=', task['id'])]) and task[
                             'status'] != 'completed':
                             activity = self.env['mail.activity'].search([('office_id', '=', task['id'])])[0]
-                            activity.write({
-                                'res_id': partner[0].id,
-                                'activity_type_id': activity_type.id,
-                                'summary': task['subject'],
-                                'date_deadline': (
-                                    datetime.strptime(task['dueDateTime']['dateTime'][:-16], '%Y-%m-%dT')).strftime(
-                                    '%Y-%m-%d'),
-                                'note': task['body']['content'],
-                                'res_model_id': partner_model.id,
-                                'office_id': task['id'],
-                            })
-                            update_task.append(activity.id)
+                            if datetime.strptime(task['lastModifiedDateTime'][:-9],
+                                                 "%Y-%m-%dT%H:%M:%S") != activity.modified_date:
+                                activity.write({
+                                    'res_id': partner[0].id,
+                                    'activity_type_id': activity_type.id,
+                                    'summary': task['subject'],
+                                    'date_deadline': (
+                                        datetime.strptime(task['dueDateTime']['dateTime'][:-16], '%Y-%m-%dT')).strftime(
+                                        '%Y-%m-%d'),
+                                    'note': task['body']['content'],
+                                    'res_model_id': partner_model.id,
+                                    'office_id': task['id'],
+                                    'modified_date':datetime.strptime(task['lastModifiedDateTime'][:-9],
+                                                 "%Y-%m-%dT%H:%M:%S")
+                                })
+                                update_task.append(activity.id)
                         elif self.env['mail.activity'].search([('office_id', '=', task['id'])]) and task[
                             'status'] == 'completed':
                             activity = self.env['mail.activity'].search([('office_id', '=', task['id'])])[0]
@@ -873,15 +906,15 @@ class Office365(models.Model):
 
                         self.env.cr.commit()
 
-                odoo_activities = self.env['mail.activity'].search(
-                    [('office_id', '!=', None), ('res_id', '=', res_user.partner_id.id)])
-                task_ids = [task['id'] for task in tasks]
-                for odoo_activity in odoo_activities:
-                    if odoo_activity.office_id not in task_ids:
-                        odoo_activity.unlink()
-                        self.env.cr.commit()
-                res_user.is_task_sync_on = False
-                self.env.cr.commit()
+                # odoo_activities = self.env['mail.activity'].search(
+                #     [('office_id', '!=', None), ('res_id', '=', res_user.partner_id.id)])
+                # task_ids = [task['id'] for task in tasks]
+                # for odoo_activity in odoo_activities:
+                #     if odoo_activity.office_id not in task_ids:
+                #         odoo_activity.unlink()
+                #         self.env.cr.commit()
+                # res_user.is_task_sync_on = False
+                # self.env.cr.commit()
                 res_user.last_task_import = datetime.now()
 
             except Exception as e:
@@ -936,7 +969,31 @@ class Office365(models.Model):
                     if nowDateTime > expires_in:
                         self.generate_refresh_token()
 
+                if is_manual:
+                    if self.from_date and not self.to_date:
+                        raise Warning('Please! Select "To Date" to Import Events.')
+                    if self.from_date and self.to_date:
+                        from_date = self.from_date
+                        to_date = self.to_date
+                    else:
+                        if res_user.last_calender_import:
+                            from_date = res_user.last_calender_import
+                            to_date = datetime.now()
+
+                else:
+                    custom_data = self.env['office.sync'].search([])[0]
+                    if custom_data.from_date and custom_data.to_date:
+                        from_date = custom_data.from_date
+                        to_date = custom_data.to_date
+                    elif res_user.last_contact_import:
+                        from_date = res_user.last_contact_import
+                        to_date = datetime.now()
+
+
                 odoo_activities = self.env['mail.activity'].search([('res_id', '=', res_user.partner_id.id)])
+                if from_date and to_date:
+                    odoo_activities= odoo_activities.search([('write_date', '>=', from_date), ('write_date', '<=', to_date)])
+
                 for activity in odoo_activities:
                     url = 'https://graph.microsoft.com/beta/me/outlook/tasks'
                     if activity.office_id:
@@ -954,19 +1011,22 @@ class Office365(models.Model):
                         },
                     }
                     if activity.office_id:
+                        if activity.is_update:
 
-                        response = requests.patch(
-                            url, data=json.dumps(data),
-                            headers={
-                                'Host': 'outlook.office.com',
-                                'Authorization': 'Bearer {0}'.format(res_user.env.user.token),
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json',
-                                'X-Target-URL': 'http://outlook.office.com',
-                                'connection': 'keep-Alive'
-                            }).content
-                        update_task.append(activity.office_id)
+                            response = requests.patch(
+                                url, data=json.dumps(data),
+                                headers={
+                                    'Host': 'outlook.office.com',
+                                    'Authorization': 'Bearer {0}'.format(res_user.env.user.token),
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json',
+                                    'X-Target-URL': 'http://outlook.office.com',
+                                    'connection': 'keep-Alive'
+                                }).content
+                            update_task.append(activity.office_id)
+                            activity.is_update = False
                     else:
+
                         response = requests.post(
                             url, data=json.dumps(data),
                             headers={
@@ -983,6 +1043,7 @@ class Office365(models.Model):
                             raise osv.except_osv(_("Error!"), (_(response["error"])))
                         activity.office_id = json.loads((response.decode('utf-8')))['id']
                         export_task.append(activity.office_id)
+                        activity.is_update = False
                     self.env.cr.commit()
 
                     # raise osv.except_osv(_("Success!"), (_("Tasks are Successfully exported! !")))
@@ -1204,8 +1265,6 @@ class Office365(models.Model):
 
                 self.env.cr.commit()
 
-
-
     def sync_customer_sent_mail(self, is_manual=None):
         """
         :return:
@@ -1371,8 +1430,37 @@ class Office365(models.Model):
                         if nowDateTime > expires_in:
                             self.generate_refresh_token()
 
+                    from_date = None
+                    to_date = None
+
+                    if is_manual:
+                        if self.from_date and not self.to_date:
+                            raise Warning('Please! Select "To Date" to Import Events.')
+                        if self.from_date and self.to_date:
+                            from_date = self.from_date
+                            to_date =   self.to_date
+                        else:
+                            if res_user.last_contact_import:
+                                from_date = res_user.last_contact_import
+                                to_date = datetime.now()
+
+                    else:
+                        custom_data = self.env['office.sync'].search([])[0]
+                        if custom_data.from_date and custom_data.to_date:
+                            from_date = custom_data.from_date
+                            to_date = custom_data.to_date
+                        elif res_user.last_contact_import:
+                            from_date = res_user.last_contact_import
+                            to_date = datetime.now()
+
+
+
                     odoo_contacts = self.env['res.partner'].search(
                         ['|',('company_id', '=', res_user.company_id.id), ('company_id', '=', None)])
+
+                    if from_date and to_date:
+                        odoo_contacts = odoo_contacts.search([('write_date', '>=', from_date), ('write_date', '<=', to_date)])
+
                     office_contact = []
                     count = 0
                     url_count = 'https://graph.microsoft.com/beta/me/contacts?$count = true'
@@ -1438,34 +1526,46 @@ class Office365(models.Model):
                                     "address": contact.email,
                                 }
                             ]
+
+
+                        data["homeAddress"]= {
+                            "street": contact.street if contact.street else (contact.street2 if contact.street2 else None),
+                            "city": contact.city if contact.city else None,
+                            "state": contact.state_id.name if contact.state_id else None,
+                            "countryOrRegion": contact.country_id.name if contact.country_id else None,
+                            "postalCode": contact.zip if contact.zip else None
+                        }
                         if not contact.email and not contact.mobile and not contact.phone:
                             continue
                         if contact.office_contact_id or contact.email in office_contact:
-                            update_response = requests.patch(
-                                url, data=json.dumps(data), headers=headers
-                            )
-                            if update_response.status_code != 200:
-                                post_response = requests.post(
-                                    url, data=json.dumps(data), headers=headers
-                                ).content
+                            if contact.create_date < contact.write_date and contact.is_update:
+                                update_response = requests.patch(
+                                    'https://graph.microsoft.com/v1.0/me/contacts/'+str(contact.office_contact_id), data=json.dumps(data), headers=headers
+                                )
+                                if update_response.status_code != 200:
+                                    post_response = requests.post(
+                                        'https://graph.microsoft.com/v1.0/me/contacts', data=json.dumps(data), headers=headers
+                                    ).content
 
-                                if 'id' not in json.loads(post_response.decode('utf-8')).keys():
-                                    raise osv.except_osv(_("Error!"), (_(post_response["error"])))
+                                    if 'id' not in json.loads(post_response.decode('utf-8')).keys():
+                                        raise osv.except_osv(_("Error!"), (_(post_response["error"])))
+                                    else:
+                                        response = json.loads(post_response.decode('utf-8'))
+                                        contact.write({'office_contact_id': response['id']})
+                                        new_contact.append(response['id'])
+
                                 else:
-                                    response = json.loads(post_response.decode('utf-8'))
+                                    response = json.loads(update_response.content)
                                     contact.write({'office_contact_id': response['id']})
-                                    new_contact.append(response['id'])
-
+                                    update_contact.append(response['id'])
+                                contact.is_update=False
                             else:
-                                response = json.loads(update_response.decode('utf-8'))
-                                contact.write({'office_contact_id': response['id']})
-                                update_contact.append(response['id'])
-
+                                continue
 
                         else:
 
                             post_response = requests.post(
-                                url, data=json.dumps(data), headers=headers
+                                'https://graph.microsoft.com/v1.0/me/contacts', data=json.dumps(data), headers=headers
                             ).content
 
                             if 'id' not in json.loads(post_response.decode('utf-8')).keys():
@@ -1473,6 +1573,7 @@ class Office365(models.Model):
                             else:
                                 response = json.loads(post_response.decode('utf-8'))
                                 contact.write({'office_contact_id': response['id']})
+                                contact.is_update = False
                                 new_contact.append(response['id'])
 
                 else:
@@ -1530,7 +1631,7 @@ class Office365(models.Model):
                         if self.from_date and not self.to_date:
                             raise Warning('Please! Select "To Date" to Import Events.')
                         if self.from_date and self.to_date:
-                            url = 'https://graph.microsoft.com/v1.0/me/contacts?$filter=lastModifiedDateTime ge {}&lastModifiedDateTime le {}' \
+                            url = 'https://graph.microsoft.com/v1.0/me/contacts?$filter=lastModifiedDateTime ge {} & lastModifiedDateTime le {}' \
                                 .format(self.from_date.strftime("%Y-%m-%dT%H:%M:%SZ"),
                                         self.to_date.strftime("%Y-%m-%dT%H:%M:%SZ"))
                         else:
@@ -1626,6 +1727,8 @@ class Office365(models.Model):
                                             if not self.env['res.partner'].search(
                                                     ['|', ('email', '=', email_address), ('phone', '=', phone)]):
                                                 contact_data = {
+                                                    'modified_date': datetime.strptime(
+                                                        each_contact['lastModifiedDateTime'][:-2], "%Y-%m-%dT%H:%M:%S"),
                                                     'company_id': res_user.company_id.id,
                                                     'name': each_contact[
                                                         'displayName'] if 'displayName' in each_contact else
@@ -1667,6 +1770,8 @@ class Office365(models.Model):
                                             if not self.env['res.partner'].search(
                                                     [('email', '=', email_address)]):
                                                 contact_data = {
+                                                    'modified_date': datetime.strptime(
+                                                        each_contact['lastModifiedDateTime'][:-2], "%Y-%m-%dT%H:%M:%S"),
                                                     'company_id': res_user.company_id.id,
                                                     'name': each_contact[
                                                         'displayName'] if 'displayName' in each_contact else
@@ -1708,6 +1813,8 @@ class Office365(models.Model):
                                             if not self.env['res.partner'].search(
                                                     [('phone', '=', phone)]):
                                                 contact_data = {
+                                                    'modified_date': datetime.strptime(
+                                                        each_contact['lastModifiedDateTime'][:-2], "%Y-%m-%dT%H:%M:%S"),
                                                     'company_id': res_user.company_id.id,
                                                     'name': each_contact[
                                                         'displayName'] if 'displayName' in each_contact else
@@ -1749,6 +1856,8 @@ class Office365(models.Model):
                                             if not self.env['res.partner'].search(
                                                     ['|', ('email', '=', email_address), ('phone', '=', phone)]):
                                                 contact_data = {
+                                                    'modified_date': datetime.strptime(
+                                                        each_contact['lastModifiedDateTime'][:-2], "%Y-%m-%dT%H:%M:%S"),
                                                     'company_id': res_user.company_id.id,
                                                     'name': each_contact[
                                                         'displayName'] if 'displayName' in each_contact else
@@ -1787,42 +1896,45 @@ class Office365(models.Model):
                                                 self.env.cr.commit()
 
                                 else:
-                                    odoo_cust.write({
-                                        'company_id': res_user.company_id.id,
-                                        'name': each_contact[
-                                            'displayName'] if 'displayName' in each_contact else
-                                        '',
-                                        'email': each_contact['emailAddresses'][0]['address']
-                                        if each_contact['emailAddresses'] else None,
-                                        'company_name': each_contact[
-                                            'companyName'] if 'companyName' in each_contact else None,
-                                        'function': each_contact[
-                                            'jobTitle'] if 'jobTitle' in each_contact else None,
-                                        'office_contact_id': each_contact['id'],
-                                        'mobile': each_contact[
-                                            'mobilePhone'] if 'mobilePhone' in each_contact else None,
-                                        'phone': phone if phone else None,
-                                        'street': each_contact['homeAddress']['street'] if each_contact[
-                                            'homeAddress'] else None,
-                                        'city': each_contact['homeAddress']['city'] if 'city' in
-                                                                                       each_contact[
-                                                                                           'homeAddress'] and
-                                                                                       each_contact[
-                                                                                           'homeAddress'] else None,
-                                        'zip': each_contact['homeAddress']['postalCode'] if 'postalCode' in
-                                                                                            each_contact[
-                                                                                                'homeAddress'] and
-                                                                                            each_contact[
-                                                                                                'homeAddress'] else None,
-                                        'state_id': self.env['res.country.state'].search(
-                                            [('name', '=', each_contact['homeAddress']['state'])]).id if
-                                        each_contact['homeAddress'] else None,
-                                        'country_id': self.env['res.country'].search(
-                                            [('name', '=',
-                                              each_contact['homeAddress']['countryOrRegion'])]).id if
-                                        each_contact['homeAddress'] else None,
-                                    })
-                                    update_contact.append(odoo_cust.id)
+                                    if datetime.strptime(each_contact['lastModifiedDateTime'][:-2],"%Y-%m-%dT%H:%M:%S") != odoo_cust.modified_date:
+                                        odoo_cust.write({
+                                            'modified_date': datetime.strptime(each_contact['lastModifiedDateTime'][:-2], "%Y-%m-%dT%H:%M:%S"),
+                                            'company_id': res_user.company_id.id,
+                                            'name': each_contact[
+                                                'displayName'] if 'displayName' in each_contact else
+                                            '',
+                                            'email': each_contact['emailAddresses'][0]['address']
+                                            if each_contact['emailAddresses'] else None,
+                                            'company_name': each_contact[
+                                                'companyName'] if 'companyName' in each_contact else None,
+                                            'function': each_contact[
+                                                'jobTitle'] if 'jobTitle' in each_contact else None,
+                                            'office_contact_id': each_contact['id'],
+                                            'mobile': each_contact[
+                                                'mobilePhone'] if 'mobilePhone' in each_contact else None,
+                                            'phone': phone if phone else None,
+                                            'street': each_contact['homeAddress']['street'] if each_contact[
+                                                'homeAddress'] else None,
+                                            'city': each_contact['homeAddress']['city'] if 'city' in
+                                                                                           each_contact[
+                                                                                               'homeAddress'] and
+                                                                                           each_contact[
+                                                                                               'homeAddress'] else None,
+                                            'zip': each_contact['homeAddress']['postalCode'] if 'postalCode' in
+                                                                                                each_contact[
+                                                                                                    'homeAddress'] and
+                                                                                                each_contact[
+                                                                                                    'homeAddress'] else None,
+                                            'state_id': self.env['res.country.state'].search(
+                                                [('name', '=', each_contact['homeAddress']['state'])]).id if
+                                            each_contact['homeAddress'] else None,
+                                            'country_id': self.env['res.country'].search(
+                                                [('name', '=',
+                                                  each_contact['homeAddress']['countryOrRegion'])]).id if
+                                            each_contact['homeAddress'] else None,
+
+                                        })
+                                        update_contact.append(odoo_cust.id)
 
                             if '@odata.nextLink' in response:
 
@@ -1969,7 +2081,6 @@ class Office365(models.Model):
             'context': context
 
         }
-
 
 
 class ImportHistory(models.Model):

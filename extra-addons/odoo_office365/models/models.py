@@ -215,6 +215,7 @@ class CustomUser(models.Model):
     event_del_flag = fields.Boolean('Delete events from Office365 calendar when delete in Odoo.')
     event_create_flag = fields.Boolean('Create events in Office365 calendar when create in Odoo.')
 
+
     def get_code(self):
 
         context = dict(self._context)
@@ -241,8 +242,19 @@ class CustomMeeting(models.Model):
     """
     _inherit = 'calendar.event'
     office_id = fields.Char('Office365 Id')
-
     category_name = fields.Char('Categories', )
+    is_update = fields.Boolean('Is Updated')
+    modified_date = fields.Datetime('Modified Date')
+
+    @api.multi
+    def write(self, values):
+        # Add code here
+        if 'is_update' in values:
+            return super(CustomMeeting, self).write(values)
+        else:
+            if 'office_id' not in values:
+                values['is_update'] = True
+            return super(CustomMeeting, self).write(values)
 
     @api.onchange('categ_ids')
     def chnage_category(self):
@@ -464,6 +476,18 @@ class CustomActivity(models.Model):
     _inherit = 'mail.activity'
 
     office_id = fields.Char('Office365 Id')
+    is_update = fields.Boolean('Is Updated')
+    modified_date = fields.Datetime('Modified Date')
+
+    @api.multi
+    def write(self, values):
+        # Add code here
+        if 'is_update' in values:
+            return super(CustomActivity, self).write(values)
+        else:
+            if 'office_id' not in values:
+                values['is_update'] = True
+            return super(CustomActivity, self).write(values)
 
     @api.model
     def create(self, values):
@@ -571,6 +595,21 @@ class CustomContacts(models.Model):
     _inherit = 'res.partner'
 
     office_contact_id = fields.Char('Office365 Id')
+    is_update = fields.Boolean(string="Is update",  )
+    modified_date = fields.Datetime('Modified Date')
+
+    @api.multi
+    def write(self, values):
+        # Add code here
+        if 'is_update' in values:
+            return super(CustomContacts, self).write(values)
+        else:
+            if 'office_contact_id' not in values:
+                values['is_update']=True
+            return super(CustomContacts, self).write(values)
+
+
+
 
 
 class CalendarEventCateg(models.Model):
