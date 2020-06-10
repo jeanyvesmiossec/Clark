@@ -10,7 +10,7 @@ import pysftp
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
-    child_child_ids = fields.Many2many('hr.employee', )
+    child_child_ids = fields.Text(string="child child ids",)
     
 
 
