@@ -10,9 +10,7 @@ import pysftp
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
-    child_child_ids = fields.Text(string="child child ids",)
-    
-
+    #child_ids_text = fields.Text(string="child child ids")
 
     @api.model
     def simus_create_job(self, job_name, company_id, company, job_obj):
