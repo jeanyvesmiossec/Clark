@@ -7,6 +7,8 @@ from odoo.tools import ustr
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
+    employee_id = fields.Many2one('hr.employee', string="employee")
+    
     @api.model
     def simus_create_subcontractor(self, cr, lines, company_simus_codes, users_simus_code):
         import pdb; pdb.set_trace()
