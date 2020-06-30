@@ -17,27 +17,7 @@
         <!--       -->
 
 
-        <!-- Inherit Form View to Modify it -->
-        <record id="view_calendar_event_calendar" model="ir.ui.view">
-            <field name="name">calendar.event.calendar</field>
-            <field name="model">calendar.event</field>
-            <field name="priority" eval="3"/>
-<!--            <field name="inherit_id" ref="calendar.view_calendar_event_calendar"/>-->
-            <field name="arch" type="xml">
 
-                <calendar string="Meetings" date_start="start" date_stop="stop" date_delay="duration" all_day="allday"
-                          readonly_form_view_id="%(calendar.view_calendar_event_form_popup)s"
-                          event_open_popup="true"
-                          event_limit="3"
-                          color="category_name">
-                    <field name="name"/>
-                    <field name="partner_ids" write_model="calendar.contacts" write_field="partner_id"
-                           avatar_field="image_small"/>
-                    <field name="is_highlighted" invisible="1"/>
-                </calendar>
-
-            </field>
-        </record>
         <!-- Inherit Form View to Modify it -->
         <record id="user_token_get_form" model="ir.ui.view">
             <field name="name">Office365 Token</field>
@@ -50,8 +30,19 @@
                         <button name="get_code" type="object" string="Login Office365" class="fa-sign-in oe_highlight"/>
                     </group>
                     <group>
-                        <field name='event_del_flag'/>
+                        <group>
+                            <field name='event_del_flag'/>
+                        </group>
+
+                        <group>
+                        <field name='office365_event_del_flag'/>
                     </group>
+                    </group>
+<!--                        <field name="calendar_id" widget="selection" />-->
+                     <group>
+
+
+                        </group>
 
                     <!-- Add your fields or attributes here -->
                 </xpath>

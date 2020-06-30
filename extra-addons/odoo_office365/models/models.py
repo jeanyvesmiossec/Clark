@@ -4,8 +4,8 @@ import logging
 import re
 
 from odoo import fields, models, api, osv
-from openerp.exceptions import ValidationError
-from openerp.osv import osv
+from odoo.exceptions import ValidationError
+
 from odoo import _, api, fields, models, modules, SUPERUSER_ID, tools
 from odoo.exceptions import UserError, AccessError
 import requests
@@ -23,6 +23,7 @@ class OfficeSettings(models.Model):
     This class separates one time office 365 settings from Token generation settings
     """
     _name = "office.settings"
+    _description = "Office365/Credentials"
 
     field_name = fields.Char('Office365')
     
@@ -89,6 +90,7 @@ class Office365UserSettings(models.Model):
     This class facilitates the users other than admin to enter office 365 credential
     """
     _name = 'office.usersettings'
+    _description = "Office/Usersttings"
     login_url = fields.Char('Login URL', compute='_compute_url', readonly=True)
     code = fields.Char('code')
     field_name = fields.Char('office')
@@ -179,6 +181,8 @@ class Office365UserSettings(models.Model):
                         data['userPrincipalName'] = response['userPrincipalName']
                         data['office365_id_address'] = 'outlook_' + response['id'].upper() + '@outlook.com'
 
+                if 'token' in data:
+                    self.get_calendars(data)
                 return data
 
         except Exception as e:
@@ -186,8 +190,39 @@ class Office365UserSettings(models.Model):
             data['error']=e
             return data
 
+    def get_calendars(self, data):
+        try:
+            calendars_response = requests.get('https://graph.microsoft.com/v1.0/me/calendars',
+                                      headers={
+                                          'Host': 'outlook.office.com',
+                                          'Authorization': 'Bearer {0}'.format(data['token']),
+                                          'Accept': 'application/json',
+                                          'X-Target-URL': 'http://outlook.office.com',
+                                          'connection': 'keep-Alive'
+                                      }).content
+            calendars = json.loads(calendars_response)
+            office_connector = self.env['office.sync'].search([])[0]
+            if 'value' in calendars:
+                odoo_calendar = self.env['office.calendars']
+                for calendar in calendars['value']:
+                    if odoo_calendar.search([('calendar_id','=',calendar['id'])]):
+                        odoo_calendar.write({'calendar_id': calendar['id'],
+                            'name': calendar['name'],
+                            'res_user': self.env.user.id,
+                            # 'connector_id':office_connector.id
 
+                        })
+                    else:
+                        odoo_calendar.create({'calendar_id': calendar['id'],
+                                             'name': calendar['name'],
+                                             'res_user': self.env.user.id,
+                                            # 'connector_id': office_connector.id
 
+                                             })
+
+        except Exception as e:
+            _logger.error("API ERROR: {}".format(e))
+            pass
 
 
 class CustomUser(models.Model):
@@ -214,8 +249,11 @@ class CustomUser(models.Model):
     last_contact_import = fields.Datetime(string="Last Import", required=False, readonly=True)
     event_del_flag = fields.Boolean('Delete events from Office365 calendar when delete in Odoo.')
     event_create_flag = fields.Boolean('Create events in Office365 calendar when create in Odoo.')
+    office365_event_del_flag = fields.Boolean('Delete event from Odoo, if the event is deleted from Office 365.')
 
 
+    # calendar_id = fields.One2many(comodel_name="office.calendars", inverse_name="res_user", string="Office365 Calendars", required=False, )
+    calendar_id = fields.Many2one(comodel_name="office.calendars", string="Office365 Calendars", required=False, )
     def get_code(self):
 
         context = dict(self._context)
@@ -245,6 +283,7 @@ class CustomMeeting(models.Model):
     category_name = fields.Char('Categories', )
     is_update = fields.Boolean('Is Updated')
     modified_date = fields.Datetime('Modified Date')
+    calendar_id = fields.Many2one(comodel_name="office.calendars", string="Office Calendar Id", required=False, )
 
     @api.multi
     def write(self, values):
@@ -255,6 +294,7 @@ class CustomMeeting(models.Model):
             if 'office_id' not in values:
                 values['is_update'] = True
             return super(CustomMeeting, self).write(values)
+
 
     @api.onchange('categ_ids')
     def chnage_category(self):
@@ -595,7 +635,8 @@ class CustomContacts(models.Model):
     _inherit = 'res.partner'
 
     office_contact_id = fields.Char('Office365 Id')
-    is_update = fields.Boolean(string="Is update",  )
+    is_update = fields.Boolean(string="Is update",default=True)
+    # is_create = fields.Boolean(string="Is create", default=True  )
     modified_date = fields.Datetime('Modified Date')
 
     @api.multi
@@ -608,12 +649,28 @@ class CustomContacts(models.Model):
                 values['is_update']=True
             return super(CustomContacts, self).write(values)
 
-
-
+    # @api.model
+    # def create(self, values):
+    #     # Add code here
+    #     if 'is_create' in values:
+    #         return super(CustomContacts, self).create(values)
+    #     else:
+    #         if 'office_contact_id' not in values:
+    #             values['is_create'] = True
+    #         return super(CustomContacts, self).create(values)
 
 
 class CalendarEventCateg(models.Model):
     _inherit = 'calendar.event.type'
     color = fields.Char(string="Color", required=False, )
     categ_id = fields.Char(string="o_category id", required=False, )
+
+
+class OfficeCalendars(models.Model):
+    _name = "office.calendars"
+    _description = "office365/Calendars"
+    calendar_id = fields.Char(string="Office Calendar ID", required=False, )
+    name = fields.Char(string="Calendar Name", required=False, )
+    res_user = fields.Many2one(comodel_name="res.users", string="User", required=False, )
+    # connector_id = fields.Many2one(comodel_name="office.sync", string="reference connector", required=False, )
 
