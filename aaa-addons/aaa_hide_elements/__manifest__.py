@@ -20,7 +20,7 @@ AAA Hide Elements
                 'mail',
                 ],
     'data': ['security/groups.xml',
-             'views/menu.xml',
+             #'views/menu.xml',
              ],
     'demo': [
     ],
