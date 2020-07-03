@@ -209,7 +209,6 @@ class ResCompany(models.Model):
     def simus_import_projects(self):
         ftp = self.env['res.ftp'].search([])
         path = ftp.file_name_sec
-        print('-------********************$$------', path)
         if exists(path):
             user_obj = self.env['res.users']
             partner_obj = self.env['res.partner']
@@ -231,7 +230,6 @@ class ResCompany(models.Model):
                             company = self.env['res.company'].search([('simus_code', '=', line[1])])
                             #company = company_simus_codes.get(line[1])
                             if company:
-                                print('-------******************company**$$------', company)
                                 simus_code = line[9]
                                 company_id = company.id
                                 name = line[8]
