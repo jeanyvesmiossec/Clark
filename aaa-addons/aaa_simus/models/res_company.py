@@ -110,14 +110,14 @@ class ResCompany(models.Model):
                                 continue
                         else:
                             company_errors += '<br></br><div>' + "No simus code: " + ustr(line) + '</div>'
-            try:
-                if new_companies:
+            #try:
+                #if new_companies:
                     cr.commit()
-                    self.simus_send_email('Companies creation', new_companies, user_admin_id)
-                if company_errors:
-                    self.simus_send_email('Company Errors', company_errors, user_admin_id)
-            except Exception as e:
-                self.simus_send_email('Errors on companies creation', str(e), user_admin_id)
+                    #self.simus_send_email('Companies creation', new_companies, user_admin_id)
+                #if company_errors:
+                    #self.simus_send_email('Company Errors', company_errors, user_admin_id)
+            #except Exception as e:
+                #self.simus_send_email('Errors on companies creation', str(e), user_admin_id)
             lines_business_manager = lines.get('BM')
             lines_employee = lines.get('Salarié')
             lines_detachment = lines.get('Détachement')
@@ -163,29 +163,29 @@ class ResCompany(models.Model):
                     values +=  '<div style="margin: 0px; padding: 0px;">' + val + ': ' + ustr(result[val]) + "</div>"
             else:
                 values = "Users Commit Error" + ustr(result['commit_error'])
-            self.simus_send_email('Import users', values, user_admin_id)
+            #self.simus_send_email('Import users', values, user_admin_id)
             if lines_employee:
                 result = employee_obj.simus_employee(cr, lines_employee, company_simus_codes, users_login,
                                                  job_obj, hr_contract_obj)
-            if 'commit_error' not in result:
-                values = ""
-                for val in ['nb_lines', 'nb_employees_created', 'nb_employees_updated', 'nb_contracts_created',
-                            'nb_contracts_updated', 'employees_created', 'contracts_created', 'employees_error']:
-                    values += '<div style="margin: 0px; padding: 0px;">' + val + ': ' + ustr(result[val]) + "</div>"
-            else:
-                values = "Employees Commit Error" + ustr(result['commit_error'])
-            self.simus_send_email('Import employees', values, user_admin_id)
+            #if 'commit_error' not in result:
+            #    values = ""
+            #    for val in ['nb_lines', 'nb_employees_created', 'nb_employees_updated', 'nb_contracts_created',
+            #                'nb_contracts_updated', 'employees_created', 'contracts_created', 'employees_error']:
+            #        values += '<div style="margin: 0px; padding: 0px;">' + val + ': ' + ustr(result[val]) + "</div>"
+            #else:
+            #    values = "Employees Commit Error" + ustr(result['commit_error'])
+            #self.simus_send_email('Import employees', values, user_admin_id)
             if lines_detachment:
                 result = employee_obj.simus_employee(cr, lines_detachment, company_simus_codes, users_login,
                                                  job_obj, hr_contract_obj)
-            if 'commit_error' not in result:
-                values = ""
-                for val in ['nb_lines', 'nb_employees_created', 'nb_employees_updated', 'nb_contracts_created',
-                            'nb_contracts_updated', 'employees_created', 'contracts_created', 'employees_error']:
-                    values += '<div style="margin: 0px; padding: 0px;">' + val + ': ' + ustr(result[val]) + "</div>"
-            else:
-                values = "Detachments Commit Error" + ustr(result['commit_error'])
-            self.simus_send_email('Import detachments', values, user_admin_id)
+            #if 'commit_error' not in result:
+                #values = ""
+                #for val in ['nb_lines', 'nb_employees_created', 'nb_employees_updated', 'nb_contracts_created',
+                            #'nb_contracts_updated', 'employees_created', 'contracts_created', 'employees_error']:
+                    #values += '<div style="margin: 0px; padding: 0px;">' + val + ': ' + ustr(result[val]) + "</div>"
+            #else:
+                #values = "Detachments Commit Error" + ustr(result['commit_error'])
+            #self.simus_send_email('Import detachments', values, user_admin_id)
             if lines_subcontractor:
                 result = partner_obj.simus_create_subcontractor(cr, lines_subcontractor, company_simus_codes,
                                                             users_simus_code)
@@ -195,7 +195,7 @@ class ResCompany(models.Model):
                     #values += '<div style="margin: 0px; padding: 0px;">' + val + ': ' + ustr(result[val]) + "</div>"
             #else:
                 #values = "Externals Commit Error" + ustr(result['commit_error'])
-            self.simus_send_email('Import externals', values, user_admin_id)
+            #self.simus_send_email('Import externals', values, user_admin_id)
             self.create_consultant_public_user()
 
     @api.model
@@ -242,7 +242,7 @@ class ResCompany(models.Model):
                                                 'customer': True,
                                                 'is_company': True}
                                 #customer_id = company['partner_simus_codes'].get(simus_code)
-                                customer = partner_obj.search([('simus_code', '=',simus_code)])
+                                customer = partner_obj.search([('simus_code', '=',simus_code), ('company_id', '=',company_id)])
                                 if customer:
                                     #partner_obj.with_context(active_test=False).browse(customer_id.id).write(partner_data)
                                     customer.write(partner_data)
@@ -336,7 +336,10 @@ class ResCompany(models.Model):
                                  'level': 1,
                                  'partner_id': consultant.id,
                                  'company_ids': [(6, 0, [consultant.company_id.id])]}
-                user = user_obj.create(user_vals)
-                user.write({'groups_id':[(5,0,0)]})                
-                public_group_id = self.env.ref('base.group_public').sudo().id
-                user.write({'groups_id': [(4, public_group_id)]})
+                user = user_obj.search([('login', '=', default_login)])
+                consultant_user = user_obj.search([('login', '=', consultant.email)])
+                if not user and not consultant_user:
+                    user = user_obj.create(user_vals)
+                    user.write({'groups_id':[(5,0,0)]})                
+                    public_group_id = self.env.ref('base.group_public').sudo().id
+                    user.write({'groups_id': [(4, public_group_id)]})
