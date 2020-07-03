@@ -19,6 +19,7 @@ class Office365(models.Model):
     This class give functionality to user for Office365 Integration
     """
     _name = 'office.sync'
+    _description = "Office/ Connector"
     # _inherit='res.users'
     # res_user = fields.Many2one(comodel_name="res.users", string="Office365 User Account", compute='compute_user_id', readonly=True)
     code = fields.Char('code', related='res_user.code', readonly=True)
@@ -27,7 +28,7 @@ class Office365(models.Model):
     send_mail_flag = fields.Boolean(string='Send messages using office365 Mail', default=True)
     is_active = fields.Boolean('Active Office365 Account')
     is_inbox = fields.Boolean(string="Sync inbox")
-
+    field_name = fields.Char('office365')
     is_sent = fields.Boolean(string="Sync Send")
 
     def default_user(self):
@@ -69,6 +70,8 @@ class Office365(models.Model):
 
     is_manual_execute = fields.Boolean(string="Manual Execute",  )
     categories = fields.Many2many('calendar.event.type', string='Select Event Category')
+    calendar_id = fields.Many2one(comodel_name="office.calendars", string="Office365 Calendars", required=False, )
+
     all_event = fields.Boolean(string="All categories events", )
 
     def sync_data(self):
@@ -115,6 +118,7 @@ class Office365(models.Model):
         """
         if self.res_user:
             self.mail_import = self.res_user.last_mail_import
+            self.calender_import = self.res_user.last_calender_import
             self.calender_import = self.res_user.last_calender_import
             self.contact_import = self.res_user.last_contact_import
             self.task_import = self.res_user.last_task_import
@@ -192,6 +196,7 @@ class Office365(models.Model):
 
         :return:
         """
+        office_connector = self.env['office.sync'].search([])[0]
         context = self._context
         current_uid = context.get('uid')
         res_user = self.env['res.users'].browse(current_uid)
@@ -210,7 +215,11 @@ class Office365(models.Model):
                 if self.categories:
                     categ_name = []
                     for catg in self.categories:
-                        url = "https://graph.microsoft.com/v1.0/me/events?$filter=categories/any(a:a+eq+'{}')".format(catg.name.replace(' ','+'))
+                        if office_connector.calendar_id and office_connector.calendar_id.calendar_id:
+                            url = "https://graph.microsoft.com/v1.0/me/calendars/"+str(office_connector.calendar_id.calendar_id)+"/eventsevents?$filter=categories/any(a:a+eq+'{}')".format(
+                                catg.name.replace(' ', '+'))
+                        else:
+                            url = "https://graph.microsoft.com/v1.0/me/events?$filter=categories/any(a:a+eq+'{}')".format(catg.name.replace(' ','+'))
                         up_event,n_event = self.get_office365_event(url,res_user)
                         update_event = update_event+len(up_event)
                         new_event = new_event + len(n_event)
@@ -220,24 +229,41 @@ class Office365(models.Model):
                         if self.from_date and not self.to_date:
                             raise Warning('Please! Select "To Date" to Import Events.')
                         if self.from_date and self.to_date:
-                            url = 'https://graph.microsoft.com/v1.0/me/events?$filter=lastModifiedDateTime ge {}&lastModifiedDateTime le {}' \
+                            if office_connector.calendar_id and office_connector.calendar_id.calendar_id:
+                                url = 'https://graph.microsoft.com/v1.0/me/calendars/'+str(office_connector.calendar_id.calendar_id)+'/events?$filter=lastModifiedDateTime ge {}&lastModifiedDateTime le {}' \
+                                    .format(self.from_date.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                            self.to_date.strftime("%Y-%m-%dT%H:%M:%SZ"))
+                            else:
+
+                                url = 'https://graph.microsoft.com/v1.0/me/events?$filter=lastModifiedDateTime ge {}&lastModifiedDateTime le {}' \
                                 .format(self.from_date.strftime("%Y-%m-%dT%H:%M:%SZ"),
                                         self.to_date.strftime("%Y-%m-%dT%H:%M:%SZ"))
                         else:
-                            url = 'https://graph.microsoft.com/v1.0/me/events'
+                            if office_connector.calendar_id and office_connector.calendar_id.calendar_id:
+                                url = 'https://graph.microsoft.com/v1.0/me/calendars/' + str(
+                                    office_connector.calendar_id.calendar_id) + '/events'
+
+                            else:
+                                url = 'https://graph.microsoft.com/v1.0/me/events'
+
 
                     else:
                         custom_data = self.env['office.sync'].search([])[0]
                         if custom_data.from_date and custom_data.to_date:
-                            url = 'https://graph.microsoft.com/v1.0/me/events?$filter=lastModifiedDateTime ge {}&lastModifiedDateTime le {}' \
+                            if office_connector.calendar_id and office_connector.calendar_id.calendar_id:
+                                url = 'https://graph.microsoft.com/v1.0/me/calendars/'+str(office_connector.calendar_id.calendar_id)+'/events?$filter=lastModifiedDateTime ge {}&lastModifiedDateTime le {}' \
+                                    .format(custom_data.from_date.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                            custom_data.to_date.strftime("%Y-%m-%dT%H:%M:%SZ"))
+                            else:
+                                url = 'https://graph.microsoft.com/v1.0/me/events?$filter=lastModifiedDateTime ge {}&lastModifiedDateTime le {}' \
                                 .format(custom_data.from_date.strftime("%Y-%m-%dT%H:%M:%SZ"),
                                         custom_data.to_date.strftime("%Y-%m-%dT%H:%M:%SZ"))
-                        elif res_user.last_calender_import:
-                            url = 'https://graph.microsoft.com/v1.0/me/events?$filter=lastModifiedDateTime ge {}&lastModifiedDateTime le {}' \
-                                .format(res_user.last_calender_import.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                                        datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+
                         else:
-                            url = 'https://graph.microsoft.com/v1.0/me/events'
+                            if office_connector.calendar_id and office_connector.calendar_id.calendar_id:
+                                url = 'https://graph.microsoft.com/v1.0/me/calendars/'+str(office_connector.calendar_id.calendar_id)+'/events'
+                            else:
+                                url = 'https://graph.microsoft.com/v1.0/me/events'
 
                     up_event, n_event = self.get_office365_event(url, res_user)
                     update_event = update_event + len(up_event)
@@ -279,6 +305,12 @@ class Office365(models.Model):
     def get_office365_event(self,url,res_user,categ_name=None):
         update_event = []
         new_event = []
+        office_connector = self.env['office.sync'].search([])[0]
+        if office_connector.calendar_id:
+            odoo_event = self.env['calendar.event'].search([('office_id', '!=', None),('calendar_id', '=', office_connector.calendar_id.id)])
+        else:
+            odoo_event = self.env['calendar.event'].search([('office_id','!=',None)])
+        odoo_event_ids =  odoo_event.mapped('office_id')
 
         try:
 
@@ -296,6 +328,8 @@ class Office365(models.Model):
                         _logger.error('Office365:{}'.format(json.loads((response.decode('utf-8')))))
                     events = json.loads((response.decode('utf-8')))['value']
                     for event in events:
+                        if event['id'] in odoo_event_ids and res_user.office365_event_del_flag:
+                            odoo_event_ids.remove(event['id'])
                         if not event['subject'] and event['body']:
                             continue
                         _logger.info('Office365: Getting event {} from Office365'.format(event['id']))
@@ -310,6 +344,8 @@ class Office365(models.Model):
                             if datetime.strptime(event['lastModifiedDateTime'][:-9],"%Y-%m-%dT%H:%M:%S")!= odoo_meeting.modified_date:
                                 _logger.info('Office365: Updating event {} In Odoo'.format(event['id']))
                                 odoo_meeting.write({
+                                    'is_update': False,
+                                    'calendar_id': office_connector.calendar_id.id if office_connector.calendar_id else None,
                                     'office_id': event['id'],
                                     'name': event['subject'],
                                     'category_name': event['categories'][0] if 'categories' in event and event['categories'] else None,
@@ -403,7 +439,9 @@ class Office365(models.Model):
                             _logger.info('Office365: Creating event {} In Odoo'.format(event['id']))
                             odoo_event = self.env['calendar.event'].create({
                                 'office_id': event['id'],
+                                'is_update': False,
                                 'name': event['subject'],
+                                'calendar_id': office_connector.calendar_id.id if office_connector.calendar_id else None,
                                 'category_name': event['categories'][0] if 'categories' in event and event['categories'] else None,
                                 "description": event['bodyPreview'],
                                 'location': (event['location']['address']['city'] + ', ' + event['location']['address'][
@@ -492,6 +530,11 @@ class Office365(models.Model):
                                 self.env.cr.commit()
 
 
+                    if odoo_event_ids and res_user.office365_event_del_flag:
+                        delete_event= self.env['calendar.event'].search([('office_id','in',odoo_event_ids)])
+                        delete_event.unlink()
+
+
                     return update_event,new_event
 
                     # res_user.last_calender_import = datetime.now()
@@ -505,12 +548,16 @@ class Office365(models.Model):
         this function export  odoo calendar event  to office 365 Calendar
 
         """
+
+        office_connector = self.env['office.sync'].search([])[0]
         context = self._context
         current_uid = context.get('uid')
         res_user = self.env['res.users'].browse(current_uid)
         export_event = []
         update_event = []
         status = None
+        from_date = None
+        to_date = None
         if res_user.token:
             try:
                 if res_user.expires_in:
@@ -544,19 +591,22 @@ class Office365(models.Model):
                     'Authorization': 'Bearer {0}'.format(res_user.token),
                     'Content-Type': 'application/json'
                 }
-                response = requests.get(
-                    'https://graph.microsoft.com/v1.0/me/calendars',
-                    headers={
-                        'Host': 'outlook.office.com',
-                        'Authorization': 'Bearer {0}'.format(res_user.token),
-                        'Accept': 'application/json',
-                        'X-Target-URL': 'http://outlook.office.com',
-                        'connection': 'keep-Alive'
-                    }).content
-                if 'value' not in json.loads((response.decode('utf-8'))).keys():
-                    raise osv.except_osv(("Access Token Expired!"), (" Please Regenerate Access Token !"))
-                calendars = json.loads((response.decode('utf-8')))['value']
-                calendar_id = calendars[0]['id']
+                if office_connector.calendar_id and office_connector.calendar_id.calendar_id:
+                    calendar_id = office_connector.calendar_id.calendar_id
+                else:
+                    response = requests.get(
+                        'https://graph.microsoft.com/v1.0/me/calendars',
+                        headers={
+                            'Host': 'outlook.office.com',
+                            'Authorization': 'Bearer {0}'.format(res_user.token),
+                            'Accept': 'application/json',
+                            'X-Target-URL': 'http://outlook.office.com',
+                            'connection': 'keep-Alive'
+                        }).content
+                    if 'value' not in json.loads((response.decode('utf-8'))).keys():
+                        raise osv.except_osv(("Access Token Expired!"), (" Please Regenerate Access Token !"))
+                    calendars = json.loads((response.decode('utf-8')))['value']
+                    calendar_id = calendars[0]['id']
 
                 meetings = self.env['calendar.event'].search([("create_uid", '=', res_user.id)])
                 if from_date and to_date:
@@ -871,7 +921,7 @@ class Office365(models.Model):
                                 'note': task['body']['content'],
                                 'res_model_id': partner_model.id,
                                 'office_id': task['id'],
-                                'modifed_date':datetime.strptime(task['lastModifiedDateTime'][:-9],
+                                'modified_date':datetime.strptime(task['lastModifiedDateTime'][:-9],
                                                  "%Y-%m-%dT%H:%M:%S")
                             })
                             new_task.append(task['id'])
@@ -932,7 +982,7 @@ class Office365(models.Model):
                                 'no_im_task': len(new_task) if new_task else 0,
                                 'no_up_task': len(update_task) if update_task else 0,
                                 'sync_type': type,
-                                'no_up_calendar': 0,
+                                'no_up_calender': 0,
                                 'no_up_contact': 0,
                                 'no_im_contact': 0,
                                 'no_im_email': 0,
@@ -1522,8 +1572,6 @@ class Office365(models.Model):
                                         "address": contact.email,
                                     }
                                 ]
-
-
                             data["homeAddress"]= {
                                 "street": contact.street if contact.street else (contact.street2 if contact.street2 else None),
                                 "city": contact.city if contact.city else None,
@@ -1535,11 +1583,12 @@ class Office365(models.Model):
                                 continue
                             if contact.office_contact_id or contact.email in office_contact:
                                 if contact.create_date < contact.write_date and contact.is_update:
-                                    update_response = requests.patch(
-                                        'https://graph.microsoft.com/v1.0/me/contacts/'+str(contact.office_contact_id), data=json.dumps(data), headers=headers
-                                    )
-                                    if update_response.status_code != 200:
-                                        pass
+                                    if contact.office_contact_id:
+                                        update_response = requests.patch(
+                                            'https://graph.microsoft.com/v1.0/me/contacts/'+str(contact.office_contact_id), data=json.dumps(data), headers=headers
+                                        )
+                                        if update_response.status_code != 200:
+                                            pass
                                         # post_response = requests.post(
                                         #     'https://graph.microsoft.com/v1.0/me/contacts', data=json.dumps(data), headers=headers
                                         # ).content
@@ -2087,6 +2136,7 @@ class Office365(models.Model):
 
 class ImportHistory(models.Model):
     _name = 'export.history'
+    _description = "Export/History"
     _order = 'last_sync desc'
     last_sync = fields.Datetime(string="Last Sync", required=False, )
     no_ex_contact = fields.Integer(string="New Contacts", required=False, )
@@ -2106,6 +2156,7 @@ class ImportHistory(models.Model):
 
 class HistoryLine(models.Model):
     _name = 'sync.history'
+    _description = "Sync/History"
     _order = 'last_sync desc'
 
     sync_id = fields.Many2one('office.sync', string='Partner Reference', required=True, ondelete='cascade',
