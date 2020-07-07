@@ -240,13 +240,23 @@ class ResCompany(models.Model):
                                                 'customer': True,
                                                 'is_company': True}
                                 #customer_id = company['partner_simus_codes'].get(simus_code)
+                                final_client_simus = line[33]
                                 customer = partner_obj.search([('simus_code', '=',simus_code), ('company_id', '=',company_id)])
+                                final_client = partner_obj.search([('simus_code', '=',final_client_simus), ('company_id', '=',company_id)])
+                                final_client_data = {
+                                        'company_type':'company',
+                                        'name': line[32],
+                                        'simus_code': line[33],
+                                        'company_id': company_id,
+                                }
                                 if customer:
                                     #partner_obj.with_context(active_test=False).browse(customer_id.id).write(partner_data)
                                     customer.write(partner_data)
                                     #result['nb_partners_updated'] += 1
                                 else:
                                     customer = partner_obj.create(partner_data)
+                                if not final_client:
+                                    final_client = partner_obj.create(final_client_data)
                                 customer_id = customer.id
                                     #company['partner_simus_codes'][simus_code] = customer_id
                                     # val = '<br></br><div>' + "id: %s" % customer_id + " name: " + ustr(name) + " simus_code: %s company_id: %s" % (simus_code, company_id) + '</div>'
@@ -262,7 +272,8 @@ class ResCompany(models.Model):
                                                 'company_id': company_id,
                                                 #'user_id': user_id,
                                                 'name': name,
-                                                'description': line[7]}
+                                                'description': line[7],
+                                                'final_client_ids': [(4,final_client.id)]}
                                 #project_id = company['project_simus_code'].get(project_code)
                                 project = project_obj.search([('simus_code', '=', project_code)])
                                 if project:

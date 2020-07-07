@@ -17,3 +17,4 @@ class ProjectProject(models.Model):
     ca_real = fields.Float(string="CA Real")
     team_id = fields.Many2one('crm.team', string="Business Unit")
     business_manager_user_id = fields.Many2one('res.users', string="BM")
+    final_client_ids = fields.Many2many('res.partner', string="Final Client")
