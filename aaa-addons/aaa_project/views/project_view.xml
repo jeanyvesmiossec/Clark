@@ -30,6 +30,9 @@
                     <field name="description"/>
                 </page>
             </xpath>
+             <xpath expr="//notebook/page[1]//field[@name='partner_id" position="after">
+                    <field name="final_client_ids"/>
+            </xpath>
         </field>
     </record>
     </data>
