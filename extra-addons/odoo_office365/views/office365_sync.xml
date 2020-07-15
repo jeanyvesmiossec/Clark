@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-      <data noupdate="1">
-        <record id="my_record_01" model="office.sync">
-            <field name="field_name">CleaveReach</field>
-        </record>
-    </data>
+
     <data>
          <record model="ir.ui.view" id="office365_sync_form_view">
             <field name="name">office365.form</field>
@@ -122,11 +118,13 @@
 
                                         </group>
                                         <group>
-                                            <field name ='categories' widget="many2many_tags" domain="[('name','!=',False)]"  attrs="{'invisible':[('is_import_calendar','=',False)]}"/>
+                                            <field name ='calendar_id' widget="selection"   />
+
+                                        </group>
+                                        <group>
+                                            <field name ='categories' widget="many2many_tags"   attrs="{'invisible':[('is_import_calendar','=',False)]}"/>
                                          </group>
-<!--                                        <group>-->
-<!--                                            <field name ='all_event' attrs="{'invisible':[('is_import_calendar','=',False)]}"/>-->
-<!--                                        </group>-->
+
                                     </group>
 
                                     <button name="sync_data"

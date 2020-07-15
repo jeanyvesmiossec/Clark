@@ -10,7 +10,7 @@ class ResUsers(models.Model):
     _inherit = "res.users"
 
     simus_code = fields.Char(string="Simus code", related='partner_id.simus_code', store=True, compute_sudo=True)
-    #login_simus = fields.Char(string="Login simus")
+    login_simus = fields.Char(string="Login simus")
     
     @api.model
     def simus_business_manager(self, cr, lines, company_simus_codes, users_login, users_simus_code, employee_obj):
@@ -39,7 +39,7 @@ class ResUsers(models.Model):
                                  'phone': phone,
                                  'active': active,
                                  'tz': 'Europe/Paris',
-#                                  'login': login,
+#                                 'login': login,
                                  'login_simus': line[6],
                                  'level': 1,
                                  'company_ids': [(6, 0, [company_id])]}

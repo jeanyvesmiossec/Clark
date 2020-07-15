@@ -11,7 +11,6 @@ class ResPartner(models.Model):
     
     @api.model
     def simus_create_subcontractor(self, cr, lines, company_simus_codes, users_simus_code):
-        import pdb; pdb.set_trace()
         result = {'nb_lines': len(lines), 'nb_partners_created': 0, 'nb_partners_updated': 0,
                   'partners_error': "", 'partners_created': ""}
         for line in lines:

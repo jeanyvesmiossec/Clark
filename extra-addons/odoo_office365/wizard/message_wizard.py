@@ -3,6 +3,7 @@ from  odoo import fields, models,api
 
 class CustomMessageWizard(models.TransientModel):
     _name = 'message.wizard'
+    _description = "Message/Wizard"
 
     title =fields.Char()
 
