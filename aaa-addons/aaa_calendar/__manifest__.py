@@ -14,6 +14,7 @@ AAA Calendar
     'images': [],
     'depends': [
                 'calendar',
+                'odoo_office365',
         ],
     'data': [
             'views/calendar_view.xml',
