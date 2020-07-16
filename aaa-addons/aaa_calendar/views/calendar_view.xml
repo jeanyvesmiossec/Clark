@@ -13,5 +13,17 @@
         </field>
     </record>
 
+    <record id="view_calendar_extention" model="ir.ui.view">
+        <field name="name">calendar.event.calendar.extention</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_calendar"/>
+        <field name="model">calendar.event</field>
+        <field name="priority" eval="2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_ids']" position="replace">
+                <field name="partner_ids" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
     </data>
 </odoo>
