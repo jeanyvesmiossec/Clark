@@ -20,10 +20,15 @@
         <field name="priority" eval="2"/>
         <field name="arch" type="xml">
         <xpath expr="//calendar[1]" position="replace">
-            <calendar string="Meetings" date_start="start" date_stop="stop" date_delay="duration" all_day="allday" readonly_form_view_id="406" event_open_popup="true" event_limit="3" color="category_name">
+             <calendar string="Meetings" date_start="start" date_stop="stop" date_delay="duration" all_day="allday"
+                readonly_form_view_id="%(calendar.view_calendar_event_form_popup)s"
+                event_open_popup="true"
+                event_limit="3"
+                color="partner_id">
                 <field name="name"/>
+                <field name="partner_ids" write_model="calendar.contacts" write_field="partner_id" avatar_field="image_small"/>
                 <field name="is_highlighted" invisible="1"/>
-                <templates>
+               <templates>
                     <t t-name="calendar-box">
                         <t t-set="color" t-value="widget.getColor(event.color_index) or 9"/>
                         <div t-att-style="typeof color === 'string' ? ('background-color:'+color)+';' : ''" t-attf-class="#{record.is_highlighted ? 'o_event_hightlight' : ''} #{typeof color === 'number' ? 'o_calendar_color_'+color : ''}">
