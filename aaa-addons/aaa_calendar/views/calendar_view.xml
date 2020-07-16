@@ -24,7 +24,7 @@
                 readonly_form_view_id="%(calendar.view_calendar_event_form_popup)s"
                 event_open_popup="true"
                 event_limit="3"
-                color="partner_id">
+                color="category_name">
                 <field name="name"/>
                 <field name="is_highlighted" invisible="1"/>
                <templates>
